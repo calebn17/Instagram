@@ -11,7 +11,8 @@ class NotificationsViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        title = "Notification"
+        view.backgroundColor = .systemBackground
        
     }
     
