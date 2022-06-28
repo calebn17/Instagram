@@ -9,6 +9,8 @@ import UIKit
 import SafariServices
 
 class SignUpViewController: UIViewController {
+    
+    public var completion: (() -> Void)?
 
 //MARK: - SubViews
     private let profilePictureImageView: UIImageView = {
@@ -187,11 +189,18 @@ class SignUpViewController: UIViewController {
             return
         }
         
-        AuthManager.shared.signUp(email: email, username: username, password: password, profilePicture: nil) { result in
+        //converting picture to a data type
+        let data = profilePictureImageView.image?.pngData()
+        AuthManager.shared.signUp(email: email, username: username, password: password, profilePicture: data) { [weak self] result in
             switch result {
-            case .success: break
+            case .success(let user):
+                UserDefaults.standard.set(user.email, forKey: "email")
+                UserDefaults.standard.set(user.username, forKey: "username")
+                //the root controller in this case is the Signedin screen (defined in SceneDelegate)
+                self?.navigationController?.popToRootViewController(animated: true)
+                self?.completion?()
             case .failure(let error):
-                print(error.localizedDescription)
+                print("Sign Up Error: \(error.localizedDescription)")
             }
         }
     }

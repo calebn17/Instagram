@@ -160,9 +160,12 @@ class SignInViewController: UIViewController {
               password.count >= 6
         else {return}
         
-        AuthManager.shared.signIn(email: email, password: password) { result in
+        AuthManager.shared.signIn(email: email, password: password) {[weak self] result in
             switch result {
-            case .success: break
+            case .success:
+                let tabVC = TabBarViewController()
+                tabVC.modalPresentationStyle = .fullScreen
+                self?.present(tabVC, animated: true, completion: nil)
             case .failure(let error):
                 print(error.localizedDescription)
             }
@@ -186,9 +189,14 @@ class SignInViewController: UIViewController {
     
     @objc private func didTapCreateAccount() {
         let vc = SignUpViewController()
-//        vc.completion = {
-//
-//        }
+        vc.completion = {
+            DispatchQueue.main.async {[weak self] in
+                //root controller in this case is the SignedIn screen so we need to present the tabbar VC
+                let tabVC = TabBarViewController()
+                tabVC.modalPresentationStyle = .fullScreen
+                self?.present(tabVC, animated: true, completion: nil)
+            }
+        }
         navigationController?.pushViewController(vc, animated: true)
     }
     
