@@ -28,7 +28,16 @@ extension UIView {
         frame.size.height
     }
 }
-
+extension Decodable {
+    init?(with dictionary: [String: Any]) {
+        //convert dictionary into json and storing in "data"
+        guard let data = try? JSONSerialization.data(withJSONObject: dictionary, options: .prettyPrinted) else {return nil}
+        
+        //decoding the json "data" into whatever Model type is specified (Self.self)
+        guard let result = try? JSONDecoder().decode(Self.self, from: data) else {return nil}
+        self = result
+    }
+}
 extension Encodable {
     func asDictionary() -> [String: Any]? {
         

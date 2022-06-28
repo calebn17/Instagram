@@ -157,17 +157,19 @@ class SignInViewController: UIViewController {
               let password = passwordField.text,
               !email.trimmingCharacters(in: .whitespaces).isEmpty,
               !password.isEmpty,
-              password.count >= 6
-        else {return}
+              password.count >= 6 else
+              {return}
         
         AuthManager.shared.signIn(email: email, password: password) {[weak self] result in
-            switch result {
-            case .success:
-                let tabVC = TabBarViewController()
-                tabVC.modalPresentationStyle = .fullScreen
-                self?.present(tabVC, animated: true, completion: nil)
-            case .failure(let error):
-                print(error.localizedDescription)
+            DispatchQueue.main.async {
+                switch result {
+                case .success:
+                    let tabVC = TabBarViewController()
+                    tabVC.modalPresentationStyle = .fullScreen
+                    self?.present(tabVC, animated: true, completion: nil)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
             }
         }
     }

@@ -15,7 +15,7 @@ class AuthManager {
     
     enum AuthError: Error {
         case newUserCreation
-        case signInError
+        case signInFailed
     }
     
     public var isSignedIn: Bool {
@@ -49,13 +49,25 @@ class AuthManager {
         }
     }
     
-    public func signIn(email: String, password: String, completion: @escaping (Result<Bool, Error>) -> Void) {
-        auth.signIn(withEmail: email, password: password) { _, error in
-            guard error == nil else {
-                completion(.failure(AuthError.signInError))
+    public func signIn(email: String, password: String, completion: @escaping (Result<User, Error>) -> Void) {
+        //Checking to see if this user exists
+        //if it does then return that user as a User object
+        //then sign in
+        DatabaseManager.shared.findUser(with: email) { [weak self] user in
+            guard let user = user else {
+                completion(.failure(AuthError.signInFailed))
                 return
             }
-            completion(.success(true))
+            self?.auth.signIn(withEmail: email, password: password) { result, error in
+                guard result != nil,
+                      error == nil else {
+                          completion(.failure(AuthError.signInFailed))
+                          return
+                      }
+                UserDefaults.standard.set(user.username, forKey: "username")
+                UserDefaults.standard.set(user.email, forKey: "email")
+                completion(.success(user))
+            }
         }
     }
     
