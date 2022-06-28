@@ -179,18 +179,31 @@ class SignUpViewController: UIViewController {
               !email.trimmingCharacters(in: .whitespaces).isEmpty,
               !password.trimmingCharacters(in: .whitespaces).isEmpty,
               !password.isEmpty,
+              username.count >= 3,
               password.count >= 6,
-              
-              username.
-        else {return}
+              username.trimmingCharacters(in: .alphanumerics).isEmpty //validate that username is only using alphanumerics
+        else {
+            presentError()
+            return
+        }
         
-        AuthManager.shared.signIn(email: email, password: password) { result in
+        AuthManager.shared.signUp(email: email, username: username, password: password, profilePicture: nil) { result in
             switch result {
             case .success: break
             case .failure(let error):
                 print(error.localizedDescription)
             }
         }
+    }
+    
+    private func presentError() {
+        let alert = UIAlertController(
+            title: "Oops",
+            message: "Please make sure to fil all fields and have a password longer than 6 characters",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+        present(alert, animated: true, completion: nil)
     }
     
     @objc private func didTapTerms() {
