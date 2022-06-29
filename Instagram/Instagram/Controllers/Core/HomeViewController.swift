@@ -109,7 +109,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                     as? PostCollectionViewCell
             else {fatalError()}
             cell.configure(with: viewModel)
-            cell.contentView.backgroundColor = colors[indexPath.row]
+            
             return cell
             
         case .actions(let viewModel):
@@ -120,7 +120,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                     as? PostActionsCollectionViewCell
             else {fatalError()}
             cell.configure(with: viewModel)
-            cell.contentView.backgroundColor = colors[indexPath.row]
+            
             return cell
             
         case .likeCount(let viewModel):
@@ -131,7 +131,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                     as? PostLikesCollectionViewCell
             else {fatalError()}
             cell.configure(with: viewModel)
-            cell.contentView.backgroundColor = colors[indexPath.row]
+            
             return cell
             
         case .caption(let viewModel):
@@ -142,7 +142,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                     as? PostCaptionCollectionViewCell
             else {fatalError()}
             cell.configure(with: viewModel)
-            cell.contentView.backgroundColor = colors[indexPath.row]
+            
             return cell
             
         case .timestamp(let viewModel):
@@ -153,7 +153,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                     as? PostDatetimeCollectionViewCell
             else {fatalError()}
             cell.configure(with: viewModel)
-            cell.contentView.backgroundColor = colors[indexPath.row]
+            
             return cell
         }
     }
