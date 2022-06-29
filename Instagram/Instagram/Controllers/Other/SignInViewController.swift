@@ -8,7 +8,7 @@
 import UIKit
 import SafariServices
 
-class SignInViewController: UIViewController {
+final class SignInViewController: UIViewController {
 
 //MARK: - SubViews
     private let headerView = SignInHeaderView()
@@ -76,7 +76,6 @@ class SignInViewController: UIViewController {
         addButtonActions()
     }
        
-    
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         configureSubviewFrames()

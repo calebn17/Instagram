@@ -8,7 +8,7 @@
 import UIKit
 import SafariServices
 
-class SignUpViewController: UIViewController {
+final class SignUpViewController: UIViewController {
     
     public var completion: (() -> Void)?
 
@@ -73,7 +73,7 @@ class SignUpViewController: UIViewController {
         return button
     }()
 
-//MARK: - View Lifecycle
+//MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
