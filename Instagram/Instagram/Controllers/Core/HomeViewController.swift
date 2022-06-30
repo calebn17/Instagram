@@ -111,7 +111,6 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             else {fatalError()}
             cell.configure(with: viewModel)
             cell.delegate = self
-            
             return cell
             
         case .actions(let viewModel):
@@ -122,7 +121,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                     as? PostActionsCollectionViewCell
             else {fatalError()}
             cell.configure(with: viewModel)
-            
+            cell.delegate = self
             return cell
             
         case .likeCount(let viewModel):
@@ -177,6 +176,26 @@ extension HomeViewController: PostCollectionViewCellDelegate {
     func postCollectionViewCellDidLike(_ cell: PostCollectionViewCell) {
         print("did tap like")
     }
+}
+
+//MARK: - PostActionsCollectionViewCell Methods
+extension HomeViewController: PostActionsCollectionViewCellDelegate {
+    func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool) {
+        //call DB to update like state
+    }
+    
+    func postActionsCollectionViewCellDidTapComment(_ cell: PostActionsCollectionViewCell) {
+        let vc = PostViewController()
+        vc.title = "Comment"
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    func postActionsCollectionViewCellDidTapShare(_ cell: PostActionsCollectionViewCell) {
+        let vc = UIActivityViewController(activityItems: ["Sharing from Instagram"], applicationActivities: [])
+        present(vc, animated: true, completion: nil)
+    }
+    
+    
 }
 
 //MARK: - Configure CollectionView
