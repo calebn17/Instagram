@@ -110,6 +110,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                     as? PostCollectionViewCell
             else {fatalError()}
             cell.configure(with: viewModel)
+            cell.delegate = self
             
             return cell
             
@@ -169,8 +170,13 @@ extension HomeViewController: PosterCollectionViewCellDelegate {
     func PosterCollectionViewCellDelegateDidTapUsername(_ cell: PosterCollectionViewCell) {
         print("tapped username")
     }
-    
-    
+}
+
+//MARK: - PostCollectionViewCell Methods
+extension HomeViewController: PostCollectionViewCellDelegate {
+    func postCollectionViewCellDidLike(_ cell: PostCollectionViewCell) {
+        print("did tap like")
+    }
 }
 
 //MARK: - Configure CollectionView

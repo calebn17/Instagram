@@ -7,8 +7,19 @@
 
 import UIKit
 
+protocol PostActionsCollectionViewCellDelegate: AnyObject {
+    func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool)
+    func postActionsCollectionViewCellDidTapComment(_ cell: PostActionsCollectionViewCell)
+    func postActionsCollectionViewCellDidTapShare(_ cell: PostActionsCollectionViewCell)
+}
+
 final class PostActionsCollectionViewCell: UICollectionViewCell {
+    
+//MARK: - Properties
     static let identifier = "PostActionsCollectionViewCell"
+    weak var delegate: PostActionsCollectionViewCellDelegate?
+    
+//MARK: - SubViews
     
     private let likeButton: UIButton = {
         let button = UIButton()
@@ -34,6 +45,8 @@ final class PostActionsCollectionViewCell: UICollectionViewCell {
         return button
     }()
     
+//MARK: - Init
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.clipsToBounds = true
@@ -52,6 +65,8 @@ final class PostActionsCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+//MARK: - Lifecycle
+    
     override func layoutSubviews() {
         super.layoutSubviews()
         let size: CGFloat = contentView.height/1.15
@@ -59,6 +74,8 @@ final class PostActionsCollectionViewCell: UICollectionViewCell {
         commentButton.frame = CGRect(x: likeButton.right + 20, y: (contentView.height - size)/2, width: size, height: size)
         shareButton.frame = CGRect(x: commentButton.right + 20, y: (contentView.height - size)/2, width: size, height: size)
     }
+    
+//MARK: - Configure
     
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -72,6 +89,8 @@ final class PostActionsCollectionViewCell: UICollectionViewCell {
         }
        
     }
+
+//MARK: - Actions
     
     @objc private func didTapLike() {}
     @objc private func didTapComment() {}
