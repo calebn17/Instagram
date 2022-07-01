@@ -8,6 +8,7 @@
 import UIKit
 import SDWebImage
 
+//MARK: - Protocol
 protocol PosterCollectionViewCellDelegate: AnyObject {
     func PosterCollectionViewCellDelegateDidTapMore(_ cell: PosterCollectionViewCell)
     func PosterCollectionViewCellDelegateDidTapUsername(_ cell: PosterCollectionViewCell)
@@ -19,7 +20,7 @@ final class PosterCollectionViewCell: UICollectionViewCell {
     static let identifier = "PosterCollectionViewCell"
     weak var delegate: PosterCollectionViewCellDelegate?
     
-//MARK: - Elements
+//MARK: - SubViews
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()

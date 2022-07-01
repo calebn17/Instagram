@@ -160,7 +160,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
 }
 
-//MARK: - PosterCollectionViewCell Methods
+//MARK: - Poster Cell Methods
 extension HomeViewController: PosterCollectionViewCellDelegate {
     func PosterCollectionViewCellDelegateDidTapMore(_ cell: PosterCollectionViewCell) {
         let sheet = UIAlertController(title: "Post Actions", message: nil, preferredStyle: .actionSheet)
@@ -180,14 +180,14 @@ extension HomeViewController: PosterCollectionViewCellDelegate {
     }
 }
 
-//MARK: - PostCollectionViewCell Methods
+//MARK: - Post Cell Methods
 extension HomeViewController: PostCollectionViewCellDelegate {
     func postCollectionViewCellDidLike(_ cell: PostCollectionViewCell) {
         print("did tap like")
     }
 }
 
-//MARK: - PostActionsCollectionViewCell Methods
+//MARK: - Post Actions Cell Methods
 extension HomeViewController: PostActionsCollectionViewCellDelegate {
     func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool) {
         //call DB to update like state
@@ -205,6 +205,7 @@ extension HomeViewController: PostActionsCollectionViewCellDelegate {
     }
 }
 
+//MARK: - Post Likes Cell Methods
 extension HomeViewController: PostLikesCollectionViewCellDelegate {
     func PostLikesCollectionViewCellDidTapLikeCount(_ cell: PostLikesCollectionViewCell) {
         let vc = ListViewController()
@@ -213,6 +214,7 @@ extension HomeViewController: PostLikesCollectionViewCellDelegate {
     }
 }
 
+//MARK: - PostCaption Cell Methods
 extension HomeViewController: PostCaptionCollectionViewCellDelegate {
     func postCaptionCollectionViewCellDidTapCaption(_ cell: PostCaptionCollectionViewCell) {
        

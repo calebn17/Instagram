@@ -8,8 +8,11 @@
 import UIKit
 
 final class PostDatetimeCollectionViewCell: UICollectionViewCell {
+
+//MARK: - Properties
     static let identifier = "PostDatetimeCollectionViewCell"
     
+//MARK: - SubViews
     private let label: UILabel = {
         let label = UILabel()
         label.numberOfLines = 1
@@ -17,6 +20,7 @@ final class PostDatetimeCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
+//MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.clipsToBounds = true
@@ -28,11 +32,13 @@ final class PostDatetimeCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+//MARK: - Lifecycle
     override func layoutSubviews() {
         super.layoutSubviews()
         label.frame = CGRect(x: 10, y: 0, width: contentView.width - 12, height: contentView.height)
     }
-    
+
+//MARK: - Configure
     override func prepareForReuse() {
         super.prepareForReuse()
         label.text = nil

@@ -7,6 +7,7 @@
 
 import UIKit
 
+//MARK: - Protocol
 protocol PostActionsCollectionViewCellDelegate: AnyObject {
     func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool)
     func postActionsCollectionViewCellDidTapComment(_ cell: PostActionsCollectionViewCell)

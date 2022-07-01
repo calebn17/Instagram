@@ -7,13 +7,18 @@
 
 import UIKit
 
+//MARK: - Protocol
 protocol PostLikesCollectionViewCellDelegate: AnyObject {
     func PostLikesCollectionViewCellDidTapLikeCount(_ cell: PostLikesCollectionViewCell)
 }
 
 final class PostLikesCollectionViewCell: UICollectionViewCell {
+
+//MARK: - Properties
     static let identifier = "PostLikesCollectionViewCell"
     weak var delegate: PostLikesCollectionViewCellDelegate?
+    
+//MARK: - SubViews
     
     private let label: UILabel = {
         let label = UILabel()
@@ -22,7 +27,7 @@ final class PostLikesCollectionViewCell: UICollectionViewCell {
         return label
     }()
     
-    
+//MARK: - Init
     override init(frame: CGRect) {
         super.init(frame: frame)
         contentView.clipsToBounds = true
@@ -35,11 +40,14 @@ final class PostLikesCollectionViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
+//MARK: - Lifecycle
     override func layoutSubviews() {
         super.layoutSubviews()
         label.frame = CGRect(x: 10, y: 0, width: contentView.width - 12, height: contentView.height)
     }
+    
+//MARK: - Configure
     
     override func prepareForReuse() {
         super.prepareForReuse()
@@ -49,6 +57,8 @@ final class PostLikesCollectionViewCell: UICollectionViewCell {
         let users = viewModel.likers
         label.text = "\(users.count) Likes"
     }
+
+//MARK: - Actions
     
     @objc private func didTapLabel() {
         delegate?.PostLikesCollectionViewCellDidTapLikeCount(self)
