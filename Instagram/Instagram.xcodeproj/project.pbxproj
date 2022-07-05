@@ -50,6 +50,7 @@
 		AF631DC2286A48D6009FB124 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF631DC1286A48D6009FB124 /* Extensions.swift */; };
 		AF631DC4286A5530009FB124 /* IGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF631DC3286A5530009FB124 /* IGTextField.swift */; };
 		AF8CDDAE287468C90074512A /* PostEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8CDDAD287468C90074512A /* PostEditViewController.swift */; };
+		AF8CDDB0287473390074512A /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8CDDAF287473390074512A /* PhotoCollectionViewCell.swift */; };
 		AFF360BB286C827100F3145A /* PosterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF360BA286C827100F3145A /* PosterCollectionViewCell.swift */; };
 		AFF360BD286C82E700F3145A /* PostCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF360BC286C82E700F3145A /* PostCollectionViewCell.swift */; };
 		AFF360BF286C832300F3145A /* PostActionsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF360BE286C832300F3145A /* PostActionsCollectionViewCell.swift */; };
@@ -128,6 +129,7 @@
 		AF631DC1286A48D6009FB124 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		AF631DC3286A5530009FB124 /* IGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGTextField.swift; sourceTree = "<group>"; };
 		AF8CDDAD287468C90074512A /* PostEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostEditViewController.swift; sourceTree = "<group>"; };
+		AF8CDDAF287473390074512A /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
 		AFF360BA286C827100F3145A /* PosterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCollectionViewCell.swift; sourceTree = "<group>"; };
 		AFF360BC286C82E700F3145A /* PostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCollectionViewCell.swift; sourceTree = "<group>"; };
 		AFF360BE286C832300F3145A /* PostActionsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostActionsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -192,6 +194,7 @@
 				AFF360B9286C825200F3145A /* Home Cells */,
 				AF631DBF286A47F2009FB124 /* SignInHeaderView.swift */,
 				AF631DC3286A5530009FB124 /* IGTextField.swift */,
+				AF8CDDAF287473390074512A /* PhotoCollectionViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -611,6 +614,7 @@
 				AF528360286C783200CC1DD3 /* PosterCollectionViewCellViewModel.swift in Sources */,
 				AFF360BD286C82E700F3145A /* PostCollectionViewCell.swift in Sources */,
 				AF05B367286A3B4500DFF0B1 /* HapticsManager.swift in Sources */,
+				AF8CDDB0287473390074512A /* PhotoCollectionViewCell.swift in Sources */,
 				AF52836A286C795F00CC1DD3 /* PostDatetimeCollectionViewCellViewModel.swift in Sources */,
 				AF05B359286A36E100DFF0B1 /* Post.swift in Sources */,
 				AF05B340286A35C200DFF0B1 /* ExploreViewController.swift in Sources */,

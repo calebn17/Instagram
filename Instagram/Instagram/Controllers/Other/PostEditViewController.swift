@@ -6,12 +6,15 @@
 //
 
 import UIKit
+import CoreImage
 
 class PostEditViewController: UIViewController {
 
 //MARK: - Properties
     
     private let image: UIImage
+    
+    private var filters =  [UIImage]()
     
 //MARK: - SubViews
     
@@ -20,6 +23,18 @@ class PostEditViewController: UIViewController {
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
         return imageView
+    }()
+    
+    private let collectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 2
+        layout.sectionInset = UIEdgeInsets(top: 1, left: 10, bottom: 1, right: 10)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.backgroundColor = .secondarySystemBackground
+        collectionView.register(PhotoCollectionViewCell.self, forCellWithReuseIdentifier: PhotoCollectionViewCell.identifier)
+        return collectionView
     }()
 
 //MARK: - Init
@@ -41,6 +56,17 @@ class PostEditViewController: UIViewController {
         title = "Edit"
         imageView.image = image
         view.addSubview(imageView)
+        setupFilters()
+        view.addSubview(collectionView)
+        collectionView.delegate = self
+        collectionView.dataSource = self
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "Next",
+            style: .done,
+            target: self,
+            action: #selector(didTapNext)
+        )
     }
     
     override func viewDidLayoutSubviews() {
@@ -51,5 +77,58 @@ class PostEditViewController: UIViewController {
             width: view.width,
             height: view.width
         )
+        collectionView.frame = CGRect(
+            x: 0,
+            y: imageView.bottom + 20,
+            width: view.width,
+            height: 100
+        )
+    }
+    
+    private func setupFilters() {
+        guard let filterImage = UIImage(systemName: "camera.filters") else {return}
+        filters.append(filterImage)
+    }
+    
+    private func filterImage(image: UIImage) {
+        guard let cgImage = image.cgImage else {return}
+        let filter = CIFilter(name: "CIColorMonochrome")
+        filter?.setValue(CIImage(cgImage: cgImage), forKey: "inputImage")
+        filter?.setValue(CIColor(red: 0.7, green: 0.7, blue: 0.7), forKey: "inputColor")
+        filter?.setValue(1.0, forKey: "inputIntensity")
+        guard let outputImage = filter?.outputImage else {return}
+        
+        let context = CIContext()
+        
+        if let outputcgImage = context.createCGImage(outputImage, from: outputImage.extent) {
+            let filteredImage = UIImage(cgImage: outputcgImage)
+            imageView.image = filteredImage
+        }
+    }
+    
+    @objc private func didTapNext() {
+        let vc = CaptionViewController(image: image)
+        vc.title = "Add Caption"
+        navigationController?.pushViewController(vc, animated: true)
+    }
+}
+
+extension PostEditViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return filters.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath)
+                as? PhotoCollectionViewCell
+        else {return UICollectionViewCell()}
+        
+        cell.configure(with: filters[indexPath.row])
+        return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        filterImage(image: image)
     }
 }
