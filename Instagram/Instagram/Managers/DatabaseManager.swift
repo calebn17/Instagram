@@ -39,4 +39,35 @@ final class DatabaseManager {
             completion(user)
         }
     }
+    
+    public func createPost(newPost: Post, completion: @escaping (Bool) -> Void) {
+        
+        guard let username = UserDefaults.standard.string(forKey: "username") else {
+            completion(false)
+            return
+        }
+        let ref = database.document("users/\(username)/posts/\(newPost.id)")
+        guard let data = newPost.asDictionary() else {
+            completion(false)
+            return
+        }
+        ref.setData(data) { error in
+            completion(error == nil)
+        }
+    }
+    
+    public func posts(for username: String, completion: @escaping (Result<[Post], Error>) -> Void) {
+        let ref = database.collection("users").document(username).collection("posts")
+        ref.getDocuments { snapshot, error in
+            guard let posts = snapshot?.documents.compactMap({
+                Post(with: $0.data())
+            }),
+                  error == nil
+            else {
+                return
+            }
+            
+            completion(.success(posts))
+        }
+    }
 }
