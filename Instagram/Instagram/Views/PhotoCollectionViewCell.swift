@@ -8,8 +8,12 @@
 import UIKit
 
 class PhotoCollectionViewCell: UICollectionViewCell {
+
+//MARK: - Properties
     
     static let identifier = "PhotoCollectionViewCell"
+    
+//MARK: - SubViews
     
     private let imageView: UIImageView = {
         let imageView = UIImageView()
@@ -18,6 +22,8 @@ class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.tintColor = .label
         return imageView
     }()
+    
+//MARK: - Init
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,11 +34,15 @@ class PhotoCollectionViewCell: UICollectionViewCell {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+//MARK: - Lifecycle
     
     override func layoutSubviews() {
         super.layoutSubviews()
         imageView.frame = contentView.bounds
     }
+
+//MARK: - Configure
     
     override func prepareForReuse() {
         super.prepareForReuse()

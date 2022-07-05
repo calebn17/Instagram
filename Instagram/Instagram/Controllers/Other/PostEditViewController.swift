@@ -84,11 +84,15 @@ class PostEditViewController: UIViewController {
             height: 100
         )
     }
+
+//MARK: - Configure
     
     private func setupFilters() {
         guard let filterImage = UIImage(systemName: "camera.filters") else {return}
         filters.append(filterImage)
     }
+    
+//MARK: - Actions
     
     private func filterImage(image: UIImage) {
         guard let cgImage = image.cgImage else {return}
@@ -107,12 +111,14 @@ class PostEditViewController: UIViewController {
     }
     
     @objc private func didTapNext() {
-        let vc = CaptionViewController(image: image)
+        guard let currentImage = imageView.image else {return}
+        let vc = CaptionViewController(image: currentImage)
         vc.title = "Add Caption"
         navigationController?.pushViewController(vc, animated: true)
     }
 }
 
+//MARK: - CollectionView Methods
 extension PostEditViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return filters.count

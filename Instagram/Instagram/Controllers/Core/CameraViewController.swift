@@ -152,6 +152,7 @@ final class CameraViewController: UIViewController {
     }
 }
 
+//MARK: - AVCapturePhotoCapture
 extension CameraViewController: AVCapturePhotoCaptureDelegate {
     
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
@@ -161,7 +162,15 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         
         captureSession?.stopRunning()
         
-        let vc = PostEditViewController(image: image)
+        guard let resizedImage = image.sd_resizedImage(
+            with: CGSize(
+                width: 640,
+                height: 640),
+            scaleMode: .aspectFill
+        )
+        else {return}
+        
+        let vc = PostEditViewController(image: resizedImage)
         vc.navigationItem.backButtonDisplayMode = .minimal
         navigationController?.pushViewController(vc, animated: false)
     }
