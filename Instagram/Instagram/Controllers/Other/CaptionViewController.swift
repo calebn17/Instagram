@@ -92,8 +92,8 @@ class CaptionViewController: UIViewController {
         else {return}
         
         //Upload Post
-        StorageManager.shared.uploadPost(data: image.pngData(), id: newPostID) { success in
-            guard success else {
+        StorageManager.shared.uploadPost(data: image.pngData(), id: newPostID) { newPostDownloadURL in
+            guard let url = newPostDownloadURL else {
                 print("error: failed to upload")
                 return
             }
@@ -102,6 +102,7 @@ class CaptionViewController: UIViewController {
                 id: newPostID,
                 caption: caption,
                 postedDate: stringDate,
+                postURLString: url.absoluteString,
                 likers: []
             )
             //Update Database
@@ -114,9 +115,6 @@ class CaptionViewController: UIViewController {
                 }
             }
         }
-        
-        
-        
     }
     
     private func createNewPostID() -> String? {

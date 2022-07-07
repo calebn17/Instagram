@@ -24,21 +24,28 @@ final class StorageManager {
         }
     }
     
-    public func uploadPost(data: Data?, id: String, completion: @escaping (Bool) -> Void) {
+    public func uploadPost(data: Data?, id: String, completion: @escaping (URL?) -> Void) {
         guard let data = data,
               let username = UserDefaults.standard.string(forKey: "username")
-        else {
-            completion(false)
-            return
-        }
-        storage.child("\(username)/posts/\(id).png").putData(data, metadata: nil) { _, error in
-            completion(error == nil)
+        else {return}
+        
+        let ref = storage.child("\(username)/posts/\(id).png")
+        ref.putData(data, metadata: nil) { _, error in
+            ref.downloadURL { url, error in
+                completion(url)
+            }
         }
     }
     
     public func downloadURL(for post: Post, completion: @escaping (URL?) -> Void) {
         guard let ref = post.storageReference else {return}
         storage.child(ref).downloadURL { url, _ in
+            completion(url)
+        }
+    }
+    
+    public func downloadProfilePictureURL(for username: String, completion: @escaping (URL?) -> Void) {
+        storage.child("\(username)/profile_picture.png").downloadURL { url, _ in
             completion(url)
         }
     }

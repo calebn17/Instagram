@@ -34,14 +34,29 @@ final class HomeViewController: UIViewController {
 //MARK: - Fetch Data
     
     private func fetchPosts() {
-        // mock data
         
         guard let username = UserDefaults.standard.string(forKey: "username") else {return}
-        DatabaseManager.shared.posts(for: username) { result in
+        DatabaseManager.shared.posts(for: username) {[weak self] result in
             DispatchQueue.main.async {
                 switch result {
                 case .success(let posts):
-                    print("\n\n\n Posts: \(posts.count)")
+                    let group = DispatchGroup()
+                    
+                    posts.forEach { model in
+                        group.enter()
+                        self?.createViewModel(model: model, username: username) { success in
+                            defer {
+                                group.leave()
+                            }
+                            if !success {
+                                print("failed to create viewmodel")
+                            }
+                        }
+                    }
+                    group.notify(queue: .main) {
+                        self?.collectionView?.reloadData()
+                    }
+                    
                 case .failure(let error):
                     print(error)
                 }
@@ -49,43 +64,51 @@ final class HomeViewController: UIViewController {
         }
     }
     
-    private func createMockData() {
-        let postData: [HomeFeedCellType] =
-        [
-            .poster(
-                viewModel:
-                    PosterCollectionViewCellViewModel(
-                        username: "caleb",
-                        profilePictureURL: URL(string: "https://iosacademy.io/assets/images/brand/icon.jpg")!)
-            ),
-            .post(
-                viewModel:
-                    PostCollectionViewCellViewModel(
-                        postURL: URL(string: "https://iosacademy.io/assets/images/courses/swiftui.png")!)
-            ),
-            .actions(
-                viewModel:
-                    PostActionsCollectionViewCellViewModel(
-                        isLiked: true)
-            ),
-            .likeCount(
-                viewModel:
-                    PostLikesCollectionViewCellViewModel(
-                        likers: ["kanye"])
-            ),
-            .caption(
-                viewModel:
-                    PostCaptionCollectionViewCellViewModel(
-                        username: "caleb",
-                        caption: "this is an awesome post")
-            ),
-            .timestamp(
-                viewModel:
-                    PostDatetimeCollectionViewCellViewModel(date: Date())
-            )
-        ]
-        viewModels.append(postData)
-        collectionView?.reloadData()
+    private func createViewModel(model: Post, username: String, completion: @escaping (Bool) -> Void) {
+        
+        StorageManager.shared.downloadProfilePictureURL(for: username) {[weak self] profilePictureURL in
+            
+            guard let postURL = URL(string: model.postURLString),
+                  let profilePictureURL = profilePictureURL
+            else {return}
+
+            let postData: [HomeFeedCellType] =
+            [
+                .poster(
+                    viewModel:
+                        PosterCollectionViewCellViewModel(
+                            username: username,
+                            profilePictureURL: profilePictureURL)
+                ),
+                .post(
+                    viewModel:
+                        PostCollectionViewCellViewModel(
+                            postURL: postURL)
+                ),
+                .actions(
+                    viewModel:
+                        PostActionsCollectionViewCellViewModel(
+                            isLiked: false)
+                ),
+                .likeCount(
+                    viewModel:
+                        PostLikesCollectionViewCellViewModel(
+                            likers: [])
+                ),
+                .caption(
+                    viewModel:
+                        PostCaptionCollectionViewCellViewModel(
+                            username: username,
+                            caption: model.caption)
+                ),
+                .timestamp(
+                    viewModel:
+                        PostDatetimeCollectionViewCellViewModel(date: DateFormatter.formatter.date(from: model.postedDate) ?? Date())
+                )
+            ]
+            self?.viewModels.append(postData)
+            completion(true)
+        }
     }
 }
 

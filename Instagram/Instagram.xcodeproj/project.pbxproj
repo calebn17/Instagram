@@ -51,6 +51,7 @@
 		AF631DC4286A5530009FB124 /* IGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF631DC3286A5530009FB124 /* IGTextField.swift */; };
 		AF8CDDAE287468C90074512A /* PostEditViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8CDDAD287468C90074512A /* PostEditViewController.swift */; };
 		AF8CDDB0287473390074512A /* PhotoCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8CDDAF287473390074512A /* PhotoCollectionViewCell.swift */; };
+		AF8E5AC82875BCCB002C7A37 /* SearchResultsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF8E5AC72875BCCB002C7A37 /* SearchResultsViewController.swift */; };
 		AFF360BB286C827100F3145A /* PosterCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF360BA286C827100F3145A /* PosterCollectionViewCell.swift */; };
 		AFF360BD286C82E700F3145A /* PostCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF360BC286C82E700F3145A /* PostCollectionViewCell.swift */; };
 		AFF360BF286C832300F3145A /* PostActionsCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AFF360BE286C832300F3145A /* PostActionsCollectionViewCell.swift */; };
@@ -130,6 +131,7 @@
 		AF631DC3286A5530009FB124 /* IGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGTextField.swift; sourceTree = "<group>"; };
 		AF8CDDAD287468C90074512A /* PostEditViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostEditViewController.swift; sourceTree = "<group>"; };
 		AF8CDDAF287473390074512A /* PhotoCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewCell.swift; sourceTree = "<group>"; };
+		AF8E5AC72875BCCB002C7A37 /* SearchResultsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultsViewController.swift; sourceTree = "<group>"; };
 		AFF360BA286C827100F3145A /* PosterCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PosterCollectionViewCell.swift; sourceTree = "<group>"; };
 		AFF360BC286C82E700F3145A /* PostCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostCollectionViewCell.swift; sourceTree = "<group>"; };
 		AFF360BE286C832300F3145A /* PostActionsCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostActionsCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -267,6 +269,7 @@
 				AF05B352286A369F00DFF0B1 /* PostViewController.swift */,
 				AF05B354286A36AA00DFF0B1 /* SettingsViewController.swift */,
 				AF8CDDAD287468C90074512A /* PostEditViewController.swift */,
+				AF8E5AC72875BCCB002C7A37 /* SearchResultsViewController.swift */,
 			);
 			path = Other;
 			sourceTree = "<group>";
@@ -604,6 +607,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF05B34D286A367400DFF0B1 /* SignUpViewController.swift in Sources */,
+				AF8E5AC82875BCCB002C7A37 /* SearchResultsViewController.swift in Sources */,
 				AF05B365286A3B3A00DFF0B1 /* AnalyticsManager.swift in Sources */,
 				AF05B35B286A36F000DFF0B1 /* RelationshipModel.swift in Sources */,
 				AF267130286A2EA2000E4702 /* Instagram.xcdatamodeld in Sources */,
