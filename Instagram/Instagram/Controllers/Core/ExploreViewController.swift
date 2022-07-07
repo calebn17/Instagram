@@ -10,8 +10,12 @@ import CoreData
 
 final class ExploreViewController: UIViewController {
     
-    private let searchVC = UISearchController(searchResultsController: SearchResultsViewController())
+//MARK: - Properties
     
+    private let searchVC = UISearchController(searchResultsController: SearchResultsViewController())
+    private var posts = [Post]()
+    
+//MARK: - Subviews
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewCompositionalLayout { index, _ in
             let item = NSCollectionLayoutItem(
@@ -70,6 +74,7 @@ final class ExploreViewController: UIViewController {
         return collectionView
     }()
 
+//MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Explore"
@@ -80,14 +85,26 @@ final class ExploreViewController: UIViewController {
         view.addSubview(collectionView)
         collectionView.delegate = self
         collectionView.dataSource = self
+        fetchData()
     }
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         collectionView.frame = view.bounds
     }
+
+//MARK: - API
+    private func fetchData() {
+        DatabaseManager.shared.explorePosts {[weak self] posts in
+            DispatchQueue.main.async {
+                self?.posts = posts
+                self?.collectionView.reloadData()
+            }
+        }
+    }
 }
 
+//MARK: - SearchResultsUpdating
 extension ExploreViewController: UISearchResultsUpdating {
     
     func updateSearchResults(for searchController: UISearchController) {
@@ -106,6 +123,7 @@ extension ExploreViewController: UISearchResultsUpdating {
     }
 }
 
+//MARK: - SearchResults VC
 extension ExploreViewController: SearchResultsViewControllerDelegate {
     func searchResultsViewController(_ vc: SearchResultsViewController, didSelectResultsWith user: User) {
         let vc = ProfileViewController(user: user)
@@ -113,6 +131,7 @@ extension ExploreViewController: SearchResultsViewControllerDelegate {
     }
 }
 
+//MARK: - Collection View
 extension ExploreViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -120,15 +139,24 @@ extension ExploreViewController: UICollectionViewDelegate, UICollectionViewDataS
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 30
+        return posts.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath)
                 as? PhotoCollectionViewCell
         else {return UICollectionViewCell()}
-        cell.configure(with: UIImage(named: "test")!)
         
+        let model = posts[indexPath.row]
+        cell.configure(with: URL(string: model.postURLString))
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        collectionView.deselectItem(at: indexPath, animated: true)
+        
+        let post = posts[indexPath.row]
+        let vc = PostViewController(with: post)
+        navigationController?.pushViewController(vc, animated: true)
     }
 }
