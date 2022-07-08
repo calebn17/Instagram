@@ -23,7 +23,7 @@
 		AF05B357286A36D700DFF0B1 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B356286A36D700DFF0B1 /* User.swift */; };
 		AF05B359286A36E100DFF0B1 /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B358286A36E100DFF0B1 /* Post.swift */; };
 		AF05B35B286A36F000DFF0B1 /* RelationshipModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B35A286A36F000DFF0B1 /* RelationshipModel.swift */; };
-		AF05B35D286A36FA00DFF0B1 /* NotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B35C286A36FA00DFF0B1 /* NotificationModel.swift */; };
+		AF05B35D286A36FA00DFF0B1 /* IGNotificationModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B35C286A36FA00DFF0B1 /* IGNotificationModel.swift */; };
 		AF05B35F286A370C00DFF0B1 /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B35E286A370C00DFF0B1 /* AuthManager.swift */; };
 		AF05B361286A3B1C00DFF0B1 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B360286A3B1C00DFF0B1 /* DatabaseManager.swift */; };
 		AF05B363286A3B2B00DFF0B1 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B362286A3B2B00DFF0B1 /* StorageManager.swift */; };
@@ -105,7 +105,7 @@
 		AF05B356286A36D700DFF0B1 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		AF05B358286A36E100DFF0B1 /* Post.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		AF05B35A286A36F000DFF0B1 /* RelationshipModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RelationshipModel.swift; sourceTree = "<group>"; };
-		AF05B35C286A36FA00DFF0B1 /* NotificationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationModel.swift; sourceTree = "<group>"; };
+		AF05B35C286A36FA00DFF0B1 /* IGNotificationModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IGNotificationModel.swift; sourceTree = "<group>"; };
 		AF05B35E286A370C00DFF0B1 /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		AF05B360286A3B1C00DFF0B1 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		AF05B362286A3B2B00DFF0B1 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
@@ -220,7 +220,7 @@
 				AF05B356286A36D700DFF0B1 /* User.swift */,
 				AF05B358286A36E100DFF0B1 /* Post.swift */,
 				AF05B35A286A36F000DFF0B1 /* RelationshipModel.swift */,
-				AF05B35C286A36FA00DFF0B1 /* NotificationModel.swift */,
+				AF05B35C286A36FA00DFF0B1 /* IGNotificationModel.swift */,
 				AF52836C286C7A4800CC1DD3 /* HomeFeedCellType.swift */,
 				AFB7D74E287745EC00FC0ECD /* NotificationCellType.swift */,
 			);
@@ -663,7 +663,7 @@
 				AF05B355286A36AA00DFF0B1 /* SettingsViewController.swift in Sources */,
 				AF05B34F286A368400DFF0B1 /* CaptionViewController.swift in Sources */,
 				AF05B363286A3B2B00DFF0B1 /* StorageManager.swift in Sources */,
-				AF05B35D286A36FA00DFF0B1 /* NotificationModel.swift in Sources */,
+				AF05B35D286A36FA00DFF0B1 /* IGNotificationModel.swift in Sources */,
 				AF05B357286A36D700DFF0B1 /* User.swift in Sources */,
 				AF8CDDAE287468C90074512A /* PostEditViewController.swift in Sources */,
 				AF05B344286A35DF00DFF0B1 /* NotificationsViewController.swift in Sources */,

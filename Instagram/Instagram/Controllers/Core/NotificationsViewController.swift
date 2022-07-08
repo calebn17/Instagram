@@ -11,6 +11,7 @@ final class NotificationsViewController: UIViewController {
 
 //MARK: - Properties
     private var viewModels: [NotificationCellType] = []
+    private var models: [IGNotification] = []
 
 //MARK: - Subviews
     private let noActivityLabel: UILabel = {
@@ -115,6 +116,7 @@ extension NotificationsViewController: UITableViewDelegate, UITableViewDataSourc
                     as? FollowNotificationTableViewCell
             else {return UITableViewCell()}
             cell.configure(with: viewModel)
+            cell.delegate = self
             return cell
             
         case .like(viewModel: let viewModel):
@@ -122,6 +124,7 @@ extension NotificationsViewController: UITableViewDelegate, UITableViewDataSourc
                     as? LikeNotificationTableViewCell
             else {return UITableViewCell()}
             cell.configure(with: viewModel)
+            cell.delegate = self
             return cell
             
         case .comment(viewModel: let viewModel):
@@ -129,6 +132,7 @@ extension NotificationsViewController: UITableViewDelegate, UITableViewDataSourc
                     as? CommentNotificationTableViewCell
             else {return UITableViewCell()}
             cell.configure(with: viewModel)
+            cell.delegate = self
             return cell
         }
     }
@@ -136,4 +140,38 @@ extension NotificationsViewController: UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
     }
+}
+
+//MARK: - Notification Cell Methods
+extension NotificationsViewController: FollowNotificationTableViewCellDelegate, CommentNotificationTableViewCellDelegate, LikeNotificationTableViewCellDelegate {
+    func followNotificationTableViewCell(_ cell: FollowNotificationTableViewCell, didTapButton isFollowing: Bool) {
+        
+    }
+    
+    func likeNotificationTableViewCell(_ cell: LikeNotificationTableViewCell, didTapPostWith viewModel: LikeNotificationCellViewModel) {
+        guard let index = viewModels.firstIndex(where: {
+            switch $0 {
+            case .comment, .follow:
+                return false
+            case .like(let current):
+                //Needed to make the LikeNotificationCellViewModel conform to the Equatable protocol
+                return current == viewModel
+            }
+        }) else {return}
+        
+        print(index)
+        //Makes sure index isnt out of bounds
+        guard index < models.count else {return}
+        let model = models[index]
+        let username = viewModel.username
+        guard let postID = model.postId else {return}
+        
+        //Find post by id from particular user
+    }
+    
+    func commentNotificationTableViewCell(_ cell: CommentNotificationTableViewCell, didTapPostWith viewModel: CommentNotificationCellViewModel) {
+        
+    }
+    
+    
 }

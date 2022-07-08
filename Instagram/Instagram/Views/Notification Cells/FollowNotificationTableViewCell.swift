@@ -7,12 +7,19 @@
 
 import UIKit
 
-class FollowNotificationTableViewCell: UITableViewCell {
+//MARK: - Protocol
+protocol FollowNotificationTableViewCellDelegate: AnyObject {
+    func followNotificationTableViewCell(_ cell: FollowNotificationTableViewCell, didTapButton isFollowing: Bool)
+}
 
-//MARK: - Properties
-   static let identifier = "FollowNotificationTableViewCell"
+class FollowNotificationTableViewCell: UITableViewCell {
     
-//MARK: - SubViews
+    //MARK: - Properties
+    static let identifier = "FollowNotificationTableViewCell"
+    weak var delegate: FollowNotificationTableViewCellDelegate?
+    private var isFollowing = false
+    
+    //MARK: - SubViews
     private let profilePictureImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.masksToBounds = true
@@ -35,7 +42,7 @@ class FollowNotificationTableViewCell: UITableViewCell {
         return button
     }()
     
-//MARK: - Init
+    //MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.clipsToBounds = true
@@ -48,8 +55,8 @@ class FollowNotificationTableViewCell: UITableViewCell {
     required init?(coder: NSCoder) {
         fatalError()
     }
-
-//MARK: - Lifecycle
+    
+    //MARK: - Lifecycle
     override func layoutSubviews() {
         super.layoutSubviews()
         let imageSize: CGFloat = contentView.height/1.5
@@ -77,7 +84,7 @@ class FollowNotificationTableViewCell: UITableViewCell {
         followButton.frame = CGRect(
             x: contentView.width - followButton.width - 24,
             y: (contentView.height - followButton.height)/2,
-            width: followButton.width + 14,
+            width: followButton.width + 20,
             height: followButton.height
         )
     }
@@ -89,23 +96,30 @@ class FollowNotificationTableViewCell: UITableViewCell {
         followButton.setTitle(nil, for: .normal)
         followButton.backgroundColor = nil
     }
-
-//MARK: - Configure
+    
+    //MARK: - Configure
     func configure(with viewModel: FollowNotificationCellViewModel) {
+        self.isFollowing = viewModel.isCurrentUserFollowing
         label.text = viewModel.username + " started following you."
         profilePictureImageView.sd_setImage(with: viewModel.profilePictureURL, completed: nil)
-        followButton.setTitle(viewModel.isCurrentUserFollowing ? "Unfollow" : "Follow", for: .normal)
-        followButton.backgroundColor = viewModel.isCurrentUserFollowing ? .tertiarySystemBackground : .link
-        followButton.setTitleColor(viewModel.isCurrentUserFollowing ? .label : .white, for: .normal)
+        updateButton()
+    }
+    
+    //MARK: - Actions
+    @objc private func didTapFollowButton() {
+        delegate?.followNotificationTableViewCell(self, didTapButton: !isFollowing)
+        self.isFollowing = !isFollowing
+        updateButton()
+    }
+    
+    private func updateButton() {
+        followButton.setTitle(isFollowing ? "Unfollow" : "Follow", for: .normal)
+        followButton.backgroundColor = isFollowing ? .tertiarySystemBackground : .link
+        followButton.setTitleColor(isFollowing ? .label : .white, for: .normal)
         
-        if viewModel.isCurrentUserFollowing {
+        if isFollowing {
             followButton.layer.borderWidth = 1
             followButton.layer.borderColor = UIColor.secondaryLabel.cgColor
         }
-    }
-    
-//MARK: - Actions
-    @objc private func didTapFollowButton() {
-        
     }
 }

@@ -7,9 +7,16 @@
 
 import UIKit
 
+//MARK: - Protocol
+protocol LikeNotificationTableViewCellDelegate: AnyObject {
+    func likeNotificationTableViewCell(_ cell: LikeNotificationTableViewCell, didTapPostWith viewModel: LikeNotificationCellViewModel)
+}
+
 class LikeNotificationTableViewCell: UITableViewCell {
     
     static let identifier = "LikeNotificationTableViewCell"
+    weak var delegate: LikeNotificationTableViewCellDelegate?
+    private var viewModel: LikeNotificationCellViewModel?
     
 //MARK: - SubViews
     private let profilePictureImageView: UIImageView = {
@@ -27,12 +34,24 @@ class LikeNotificationTableViewCell: UITableViewCell {
         return label
     }()
     
+    private let postImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.layer.masksToBounds = true
+        imageView.contentMode = .scaleAspectFill
+        return imageView
+    }()
+    
 //MARK: - Init
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         contentView.clipsToBounds = true
         contentView.addSubview(label)
         contentView.addSubview(profilePictureImageView)
+        contentView.addSubview(postImageView)
+        
+        postImageView.isUserInteractionEnabled = true
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapPost))
+        postImageView.addGestureRecognizer(tap)
     }
     
     required init?(coder: NSCoder) {
@@ -51,7 +70,20 @@ class LikeNotificationTableViewCell: UITableViewCell {
         )
         profilePictureImageView.layer.cornerRadius = imageSize/2
         
-        let labelSize = label.sizeThatFits(bounds.size)
+        let postSize: CGFloat = contentView.height - 6
+        postImageView.frame = CGRect(
+            x: contentView.width - postSize - 10,
+            y: 3,
+            width: postSize,
+            height: postSize
+        )
+        
+        let labelSize = label.sizeThatFits(
+            CGSize(
+                width: contentView.width - profilePictureImageView.right - 25 - postSize,
+                height: contentView.height
+            )
+        )
         label.frame = CGRect(
             x: profilePictureImageView.right + 10,
             y: 0,
@@ -64,10 +96,20 @@ class LikeNotificationTableViewCell: UITableViewCell {
         super.prepareForReuse()
         label.text = nil
         profilePictureImageView.image = nil
+        postImageView.image = nil
     }
     
 //MARK: - Configure
     func configure(with viewModel: LikeNotificationCellViewModel) {
-        
+        self.viewModel = viewModel
+        profilePictureImageView.sd_setImage(with: viewModel.profilePictureURL, completed: nil)
+        label.text = viewModel.username + " liked your post"
+        postImageView.sd_setImage(with: viewModel.postURL, completed: nil)
+    }
+    
+//MARK: - Actions
+    @objc private func didTapPost() {
+        guard let vm = viewModel else {return}
+        delegate?.likeNotificationTableViewCell(self, didTapPostWith: vm)
     }
 }
