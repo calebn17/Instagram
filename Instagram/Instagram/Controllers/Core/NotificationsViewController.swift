@@ -58,11 +58,73 @@ final class NotificationsViewController: UIViewController {
 
 //MARK: - API
     private func fetchNotifications() {
-//        NotificationsManager.shared.getNotifications { notifications in
-//
-//        }
-        mockData()
-        
+        NotificationsManager.shared.getNotifications {[weak self] models in
+            
+            DispatchQueue.main.async {
+                self?.models = models
+                self?.createViewModels()
+            }
+        }
+    }
+    
+    private func createViewModels() {
+        models.forEach { model in
+            guard let type = NotificationsManager.T(rawValue: model.notificationType),
+                  let profilePictureURL = URL(string: model.profilePictureURLString)
+            else {return}
+            let username = model.username
+            
+            switch type {
+            case .like:
+                guard let postURL = URL(string: model.postURLString ?? "") else {return}
+                viewModels.append(
+                    .like(
+                        viewModel:
+                            LikeNotificationCellViewModel(
+                                username: username,
+                                profilePictureURL: profilePictureURL,
+                                postURL: postURL,
+                                date: model.dateString
+                            )
+                    )
+                )
+            case .comment:
+                guard let postURL = URL(string: model.postURLString ?? "") else {return}
+                viewModels.append(
+                    .comment(
+                        viewModel:
+                            CommentNotificationCellViewModel(
+                                username: username,
+                                profilePictureURL: profilePictureURL,
+                                postURL: postURL,
+                                date: model.dateString
+                            )
+                    )
+                )
+            case .follow:
+                guard let isFollowing = model.isFollowing else {return}
+                viewModels.append(
+                    .follow(
+                        viewModel:
+                            FollowNotificationCellViewModel(
+                                username: username,
+                                profilePictureURL: profilePictureURL,
+                                isCurrentUserFollowing: isFollowing,
+                                date: model.dateString
+                            )
+                    )
+                )
+            }
+        }
+        if viewModels.isEmpty {
+            noActivityLabel.isHidden = false
+            tableView.isHidden = true
+        }
+        else {
+            noActivityLabel.isHidden = true
+            tableView.isHidden = false
+            tableView.reloadData()
+        }
     }
     
     private func mockData() {
@@ -77,7 +139,8 @@ final class NotificationsViewController: UIViewController {
                     LikeNotificationCellViewModel(
                         username: "kyliejenner",
                         profilePictureURL: iconURL,
-                        postURL:postURL
+                        postURL:postURL,
+                        date: "March 12"
                     )
                  ),
             .comment(
@@ -85,7 +148,8 @@ final class NotificationsViewController: UIViewController {
                     CommentNotificationCellViewModel(
                         username: "jeffbezos",
                         profilePictureURL: iconURL,
-                        postURL: postURL
+                        postURL: postURL,
+                        date: "March 12"
                     )
             ),
             .follow(
@@ -93,7 +157,8 @@ final class NotificationsViewController: UIViewController {
                     FollowNotificationCellViewModel(
                         username: "zuckerberg",
                         profilePictureURL: iconURL,
-                        isCurrentUserFollowing: true
+                        isCurrentUserFollowing: true,
+                        date: "March 12"
                     )
             )
         ]
@@ -137,6 +202,30 @@ extension NotificationsViewController: UITableViewDelegate, UITableViewDataSourc
         }
     }
     
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        let cellType = viewModels[indexPath.row]
+        let username: String
+        
+        switch cellType {
+        case .follow(viewModel: let viewModel):
+            username = viewModel.username
+        case .like(viewModel: let viewModel):
+            username = viewModel.username
+        case .comment(viewModel: let viewModel):
+            username = viewModel.username
+        }
+        DatabaseManager.shared.findUser(username: username) { [weak self] user in
+            guard let user = user else {return}
+            
+            DispatchQueue.main.async {
+                let vc = ProfileViewController(user: user)
+                self?.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+    }
+    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
     }
@@ -144,8 +233,19 @@ extension NotificationsViewController: UITableViewDelegate, UITableViewDataSourc
 
 //MARK: - Notification Cell Methods
 extension NotificationsViewController: FollowNotificationTableViewCellDelegate, CommentNotificationTableViewCellDelegate, LikeNotificationTableViewCellDelegate {
-    func followNotificationTableViewCell(_ cell: FollowNotificationTableViewCell, didTapButton isFollowing: Bool) {
-        
+    
+    func followNotificationTableViewCell(_ cell: FollowNotificationTableViewCell, didTapButton isFollowing: Bool, viewModel: FollowNotificationCellViewModel) {
+        let username = viewModel.username
+        print("Request follow = \(isFollowing) for user = \(username)")
+        DatabaseManager.shared.updateRelationship(state: isFollowing ? .follow : .unfollow, for: username) {[weak self] success in
+            if !success {
+                DispatchQueue.main.async {
+                    let alert = UIAlertController(title: "Oops", message: "Unable to perform action.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+                    self?.present(alert, animated: true, completion: nil)
+                }
+            }
+        }
     }
     
     func likeNotificationTableViewCell(_ cell: LikeNotificationTableViewCell, didTapPostWith viewModel: LikeNotificationCellViewModel) {
@@ -159,19 +259,47 @@ extension NotificationsViewController: FollowNotificationTableViewCellDelegate, 
             }
         }) else {return}
         
-        print(index)
-        //Makes sure index isnt out of bounds
-        guard index < models.count else {return}
-        let model = models[index]
-        let username = viewModel.username
-        guard let postID = model.postId else {return}
-        
-        //Find post by id from particular user
+        openPost(index: index, username: viewModel.username)
     }
     
     func commentNotificationTableViewCell(_ cell: CommentNotificationTableViewCell, didTapPostWith viewModel: CommentNotificationCellViewModel) {
+        guard let index = viewModels.firstIndex(where: {
+            switch $0 {
+            case .like, .follow:
+                return false
+            case .comment(let current):
+                //Needed to make the LikeNotificationCellViewModel conform to the Equatable protocol
+                return current == viewModel
+            }
+        }) else {return}
+        
+        openPost(index: index, username: viewModel.username)
+        
         
     }
     
-    
+    private func openPost(index: Int, username: String) {
+        //Makes sure index isnt out of bounds
+        guard index < models.count else {return}
+        
+        let model = models[index]
+        let username = username
+        guard let postID = model.postId else {return}
+        
+        //Find post by id from particular user
+        DatabaseManager.shared.getPost(with: postID, from: username) { [weak self] post in
+            DispatchQueue.main.async {
+                guard let post = post else {
+                    let alert = UIAlertController(title: "Oops", message: "We are unable to open this post.", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+                    self?.present(alert, animated: true, completion: nil)
+                    return
+                }
+                
+                let vc = PostViewController(with: post)
+                self?.navigationController?.pushViewController(vc, animated: true)
+            }
+            
+        }
+    }
 }

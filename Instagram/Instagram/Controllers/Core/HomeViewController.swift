@@ -70,7 +70,7 @@ final class HomeViewController: UIViewController {
             
             guard let postURL = URL(string: model.postURLString),
                   let profilePictureURL = profilePictureURL
-            else {return}
+            else {completion(false); return}
 
             let postData: [HomeFeedCellType] =
             [

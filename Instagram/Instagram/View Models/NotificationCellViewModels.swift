@@ -11,16 +11,19 @@ struct LikeNotificationCellViewModel: Equatable {
     let username: String
     let profilePictureURL: URL
     let postURL: URL
+    let date: String
 }
 
-struct FollowNotificationCellViewModel {
+struct FollowNotificationCellViewModel: Equatable {
     let username: String
     let profilePictureURL: URL
     let isCurrentUserFollowing: Bool
+    let date: String
 }
 
-struct CommentNotificationCellViewModel {
+struct CommentNotificationCellViewModel: Equatable {
     let username: String
     let profilePictureURL: URL
     let postURL: URL
+    let date: String
 }

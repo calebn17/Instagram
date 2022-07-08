@@ -17,6 +17,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
         FirebaseApp.configure()
+//        
+//        //Add dummy notifications for current user
+//        let id = NotificationsManager.newIdentifier()
+//        let model = IGNotification(
+//            identifier: id,
+//            notificationType: 3,
+//            profilePictureURLString: "https://iosacademy.io/assets/images/brand/icon.jpg",
+//            username: "joebiden",
+//            dateString: String.date(from: Date()) ?? "Now",
+//            isFollowing: false,
+//            postId: nil,
+//            postURLString: nil
+//        )
+//        NotificationsManager.shared.create(notification: model, for: "caleb")
+
         return true
     }
 

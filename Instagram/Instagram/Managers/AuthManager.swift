@@ -53,7 +53,7 @@ class AuthManager {
         //Checking to see if this user exists
         //if it does then return that user as a User object
         //then sign in
-        DatabaseManager.shared.findUser(with: email) { [weak self] user in
+        DatabaseManager.shared.findUser(email: email) { [weak self] user in
             guard let user = user else {
                 completion(.failure(AuthError.signInFailed))
                 return
