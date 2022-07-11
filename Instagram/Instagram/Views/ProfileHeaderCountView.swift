@@ -64,13 +64,7 @@ class ProfileHeaderCountView: UIView {
         return button
     }()
     
-    private let actionButton: UIButton = {
-        let button = UIButton()
-        button.backgroundColor = .systemBlue
-        button.setTitle("Follow", for: .normal)
-        button.setTitleColor(.white, for: .normal)
-        return button
-    }()
+    private let actionButton = IGFollowButton()
 
 //MARK: - Init
     override init(frame: CGRect) {
@@ -121,24 +115,10 @@ class ProfileHeaderCountView: UIView {
             
         case .follow(isFollowing: let isFollowing):
             self.isFollowing = isFollowing
-            updateFollowButton()
+            actionButton.configure(for: isFollowing ? .unfollow : .follow)
         }
     }
-    
-    private func updateFollowButton() {
-        actionButton.backgroundColor = isFollowing ? .systemBackground : .systemBlue
-        actionButton.setTitle(isFollowing ? "Unfollow" : "Follow", for: .normal)
-        actionButton.setTitleColor(isFollowing ? .label : .white, for: .normal)
-        
-        if isFollowing {
-            actionButton.layer.borderWidth = 0.5
-            actionButton.layer.borderColor = UIColor.tertiaryLabel.cgColor
-        }
-        else {
-            actionButton.layer.borderWidth = 0
-        }
-    }
-    
+
 //MARK: - Actions
     @objc func didTapFollowers() {
         delegate?.profileHeaderCountViewDidTapFollowers(self)
@@ -168,7 +148,7 @@ class ProfileHeaderCountView: UIView {
                 delegate?.profileHeaderCountViewDidTapFollow(self)
             }
             self.isFollowing = !isFollowing
-            updateFollowButton()
+            actionButton.configure(for: isFollowing ? .unfollow : .follow)
         }
     }
 }
