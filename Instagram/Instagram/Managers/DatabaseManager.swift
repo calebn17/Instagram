@@ -10,6 +10,7 @@ import FirebaseFirestore
 
 final class DatabaseManager {
     
+//MARK: - Properties
     static let shared = DatabaseManager()
     private init() {}
     let database = Firestore.firestore()
@@ -18,6 +19,8 @@ final class DatabaseManager {
         case follow
         case unfollow
     }
+    
+//MARK: - User
     
     public func createUser(newUser: User, completion: @escaping (Bool) -> Void) {
         
@@ -59,6 +62,46 @@ final class DatabaseManager {
         }
     }
     
+    public func findUsers(with usernamePrefix: String, completion: @escaping ([User]) -> Void) {
+        let ref = database.collection("users")
+        ref.getDocuments { snapshot, error in
+            guard let users = snapshot?.documents.compactMap({ User(with: $0.data()) }),
+                  error == nil
+            else {
+                completion([])
+                return
+            }
+            let subset = users.filter({$0.username.lowercased().hasPrefix(usernamePrefix.lowercased())})
+            completion(subset)
+        }
+    }
+    
+    
+    
+    public func getUserInfo(username: String, completion: @escaping (UserInfo?) -> Void) {
+        let ref = database.collection("users").document(username).collection("information").document("basic")
+        ref.getDocument { snapshot, error in
+            guard let data = snapshot?.data(),
+                  let userInfo = UserInfo(with: data)
+            else {
+                completion(nil)
+                return
+            }
+            completion(userInfo)
+        }
+    }
+    
+    public func setUserInfo(userInfo: UserInfo, completion: @escaping (Bool) -> Void) {
+        guard let username = UserDefaults.standard.string(forKey: "username"),
+              let data = userInfo.asDictionary() else {return}
+        
+        let ref = database.collection("users").document(username).collection("information").document("basic")
+        ref.setData(data) { error in
+            completion(error == nil)
+        }
+    }
+    
+//MARK: - Post
     public func createPost(newPost: Post, completion: @escaping (Bool) -> Void) {
         
         guard let username = UserDefaults.standard.string(forKey: "username") else {
@@ -86,20 +129,6 @@ final class DatabaseManager {
                 return
             }
             completion(.success(posts))
-        }
-    }
-    
-    public func findUsers(with usernamePrefix: String, completion: @escaping ([User]) -> Void) {
-        let ref = database.collection("users")
-        ref.getDocuments { snapshot, error in
-            guard let users = snapshot?.documents.compactMap({ User(with: $0.data()) }),
-                  error == nil
-            else {
-                completion([])
-                return
-            }
-            let subset = users.filter({$0.username.lowercased().hasPrefix(usernamePrefix.lowercased())})
-            completion(subset)
         }
     }
     
@@ -134,6 +163,19 @@ final class DatabaseManager {
         }
     }
     
+    public func getPost(with identifier: String, from username: String, completion: @escaping (Post?) -> Void) {
+        let ref = database.collection("users").document(username).collection("posts").document(identifier)
+        ref.getDocument { snapshot, error in
+            guard let data = snapshot?.data(),
+                  error == nil else {
+                      completion(nil)
+                      return
+                  }
+            completion(Post(with: data))
+        }
+    }
+
+//MARK: - Notifications
     public func getNotifications(completion: @escaping ([IGNotification]) -> Void) {
         guard let username = UserDefaults.standard.string(forKey: "username") else {
             completion([])
@@ -158,15 +200,27 @@ final class DatabaseManager {
         ref.setData(data)
     }
     
-    public func getPost(with identifier: String, from username: String, completion: @escaping (Post?) -> Void) {
-        let ref = database.collection("users").document(username).collection("posts").document(identifier)
+    
+    
+//MARK: - Profile Header
+    
+    public func isFollowing(targetUsername: String, completion: @escaping (Bool) -> Void) {
+        
+        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else {
+            completion(false)
+            return
+        }
+        let ref = database.collection("users").document(targetUsername).collection("followers").document(currentUsername)
         ref.getDocument { snapshot, error in
-            guard let data = snapshot?.data(),
-                  error == nil else {
-                      completion(nil)
-                      return
-                  }
-            completion(Post(with: data))
+            guard snapshot != nil, error == nil else {
+                // The currentUsername is not in the targetUser's followers list
+                // currentUser is not following
+                completion(false)
+                return
+            }
+            // The currentUsername IS in the the targetUser's followers list
+            // currentUser is following
+            completion(true)
         }
     }
     
@@ -178,7 +232,6 @@ final class DatabaseManager {
             return
         }
         
-    
         let currentFollowing = database.collection("users").document(currentUsername).collection("following")
         let targetUserFollowers = database.collection("users").document(targetUsername).collection("followers")
         
@@ -257,49 +310,6 @@ final class DatabaseManager {
             )
             
             completion(result)
-        }
-    }
-    
-    public func isFollowing(targetUsername: String, completion: @escaping (Bool) -> Void) {
-        
-        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else {
-            completion(false)
-            return
-        }
-        let ref = database.collection("users").document(targetUsername).collection("followers").document(currentUsername)
-        ref.getDocument { snapshot, error in
-            guard snapshot != nil, error == nil else {
-                // The currentUsername is not in the targetUser's followers list
-                // currentUser is not following
-                completion(false)
-                return
-            }
-            // The currentUsername IS in the the targetUser's followers list
-            // currentUser is following
-            completion(true)
-        }
-    }
-    
-    public func getUserInfo(username: String, completion: @escaping (UserInfo?) -> Void) {
-        let ref = database.collection("users").document(username).collection("information").document("basic")
-        ref.getDocument { snapshot, error in
-            guard let data = snapshot?.data(),
-                  let userInfo = UserInfo(with: data)
-            else {
-                completion(nil)
-                return
-            }
-            completion(userInfo)
-        }
-    }
-    
-    public func setUserInfo(userInfo: UserInfo, completion: @escaping (Bool) -> Void) {
-        guard let username = UserDefaults.standard.string(forKey: "username"),
-              let data = userInfo.asDictionary() else {return}
-        
-        let ref = database.collection("users").document(username).collection("information").document("basic")
-        ref.setData(data) { error in
-            completion(error == nil)
         }
     }
 }

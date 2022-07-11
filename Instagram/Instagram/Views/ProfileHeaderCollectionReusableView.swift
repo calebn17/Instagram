@@ -7,15 +7,21 @@
 
 import UIKit
 
+protocol ProfileHeaderCollectionReusableViewDelegate: AnyObject {
+    func profileHeaderCollectionReusableViewDidTapProfilePicture(_ header: ProfileHeaderCollectionReusableView)
+}
+
 class ProfileHeaderCollectionReusableView: UICollectionReusableView {
     
 //MARK: - Properties
     static let identifier = "ProfileHeaderCollectionReusableView"
+    weak var delegate: ProfileHeaderCollectionReusableViewDelegate?
     
 //MARK: - SubViews
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.isUserInteractionEnabled = true
         imageView.clipsToBounds = true
         imageView.layer.masksToBounds = true
         imageView.backgroundColor = .secondarySystemBackground
@@ -38,6 +44,9 @@ class ProfileHeaderCollectionReusableView: UICollectionReusableView {
         addSubview(imageView)
         addSubview(countContainerView)
         addSubview(bioLabel)
+        
+        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapImage))
+        imageView.addGestureRecognizer(tap)
     }
     
     required init?(coder: NSCoder) {
@@ -93,5 +102,10 @@ class ProfileHeaderCollectionReusableView: UICollectionReusableView {
             actionType: viewModel.buttonType
         )
         countContainerView.configure(with: containerViewModel)
+    }
+    
+//MARK: - Actions
+    @objc private func didTapImage() {
+        delegate?.profileHeaderCollectionReusableViewDidTapProfilePicture(self)
     }
 }

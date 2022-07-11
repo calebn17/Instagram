@@ -16,6 +16,7 @@ final class ProfileViewController: UIViewController {
         return user.username.lowercased() == UserDefaults.standard.string(forKey: "username")?.lowercased()
     }
     private var headerViewModel: ProfileHeaderViewModel?
+    private var posts: [Post] = []
     
 //MARK: - SubViews
     
@@ -69,6 +70,24 @@ final class ProfileViewController: UIViewController {
 //MARK: - API
     
     private func fetchProfileInfo() {
+        let group = DispatchGroup()
+        
+        // Fetch Posts
+        group.enter()
+        DatabaseManager.shared.posts(for: user.username) { [weak self] result in
+            defer {
+                group.leave()
+            }
+            
+            switch result {
+            case .success(let posts):
+                self?.posts = posts
+                
+            case .failure:break
+            }
+        }
+        
+        // Fetch Profile Header Info
         
         var profilePictureURL: URL?
         var buttonType: ProfileButtonType = .edit
@@ -78,7 +97,7 @@ final class ProfileViewController: UIViewController {
         var name: String?
         var bio: String?
         
-        let group = DispatchGroup()
+        
         
         // Counts (3)
         group.enter()
@@ -111,6 +130,9 @@ final class ProfileViewController: UIViewController {
             group.enter()
             // ...get follow state
             DatabaseManager.shared.isFollowing(targetUsername: user.username) { isFollowing in
+                defer {
+                    group.leave()
+                }
                 buttonType = .follow(isFollowing: isFollowing)
             }
         }
@@ -140,21 +162,21 @@ final class ProfileViewController: UIViewController {
 //MARK: - CollectionView Methods
 extension ProfileViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 30
+        return posts.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCollectionViewCell.identifier, for: indexPath) as? PhotoCollectionViewCell
         else {fatalError()}
-        cell.configure(with: UIImage(named: "test")!)
+        cell.configure(with: URL(string: posts[indexPath.row].postURLString))
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
-        //let post = posts[indexPath.row]
-        //let vc = PostViewController(with: post)
-        //navigationController?.pushViewController(vc, animated: true)
+        let post = posts[indexPath.row]
+        let vc = PostViewController(with: post)
+        navigationController?.pushViewController(vc, animated: true)
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
@@ -170,6 +192,7 @@ extension ProfileViewController: UICollectionViewDelegate, UICollectionViewDataS
             headerView.countContainerView.delegate = self
             headerView.configure(with: viewModel)
         }
+        headerView.delegate = self
         return headerView
     }
 }
@@ -185,7 +208,8 @@ extension ProfileViewController: ProfileHeaderCountViewDelegate {
     }
     
     func profileHeaderCountViewDidTapPosts(_ containerView: ProfileHeaderCountView) {
-        
+        guard posts.count >= 18 else {return}
+        collectionView?.setContentOffset(CGPoint(x: 0, y: view.width * 0.7), animated: true)
     }
     
     func profileHeaderCountViewDidTapEditProfile(_ containerView: ProfileHeaderCountView) {
@@ -207,8 +231,59 @@ extension ProfileViewController: ProfileHeaderCountViewDelegate {
     func profileHeaderCountViewDidTapUnfollow(_ containerView: ProfileHeaderCountView) {
         
     }
+}
+
+//MARK: - ProfileheaderCollectionReusableView Methods
+extension ProfileViewController: ProfileHeaderCollectionReusableViewDelegate {
+    func profileHeaderCollectionReusableViewDidTapProfilePicture(_ header: ProfileHeaderCollectionReusableView) {
+        // User can only change their own profile picture (only when they view their own profile)
+        guard isCurrentUser else {return}
+        
+        let sheet = UIAlertController(
+            title: "Change profile picture",
+            message: "Update your profile picture",
+            preferredStyle: .actionSheet
+        )
+        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+        sheet.addAction(UIAlertAction(title: "Take Photo", style: .default, handler: {[weak self] _ in
+            DispatchQueue.main.async {
+                let picker = UIImagePickerController()
+                picker.sourceType = .camera
+                picker.allowsEditing = true
+                picker.delegate = self
+                self?.present(picker, animated: true, completion: nil)
+            }
+        }))
+        sheet.addAction(UIAlertAction(title: "Choose Photo", style: .default, handler: {[weak self] _ in
+            DispatchQueue.main.async {
+                let picker = UIImagePickerController()
+                picker.sourceType = .photoLibrary
+                picker.allowsEditing = true
+                picker.delegate = self
+                self?.present(picker, animated: true, completion: nil)
+            }
+        }))
+        present(sheet, animated: true, completion: nil)
+    }
+}
+
+extension ProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
     
-    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        guard let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else {return}
+        StorageManager.shared.uploadProfilePicture(username: user.username, data: image.pngData()) {[weak self] success in
+            if success {
+                self?.headerViewModel = nil
+                self?.posts = []
+                //Dont need to push to the main thread in this block because fetchProfileInfo already does that
+                self?.fetchProfileInfo()
+            }
+        }
+    }
 }
 
 //MARK: - Configure Collection View

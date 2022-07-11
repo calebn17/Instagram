@@ -22,6 +22,7 @@ class ProfileHeaderCountView: UIView {
 //MARK: - Properties
     weak var delegate: ProfileHeaderCountViewDelegate?
     private var action = ProfileButtonType.edit
+    private var isFollowing = false
     
 //MARK: - SubViews
     private let followerCountButton: UIButton = {
@@ -119,17 +120,22 @@ class ProfileHeaderCountView: UIView {
             actionButton.layer.borderColor = UIColor.tertiaryLabel.cgColor
             
         case .follow(isFollowing: let isFollowing):
-            actionButton.backgroundColor = isFollowing ? .systemBackground : .systemBlue
-            actionButton.setTitle(isFollowing ? "Unfollow" : "Follow", for: .normal)
-            actionButton.setTitleColor(isFollowing ? .label : .white, for: .normal)
-            
-            if isFollowing {
-                actionButton.layer.borderWidth = 0.5
-                actionButton.layer.borderColor = UIColor.tertiaryLabel.cgColor
-            }
-            else {
-                actionButton.layer.borderWidth = 0
-            }
+            self.isFollowing = isFollowing
+            updateFollowButton()
+        }
+    }
+    
+    private func updateFollowButton() {
+        actionButton.backgroundColor = isFollowing ? .systemBackground : .systemBlue
+        actionButton.setTitle(isFollowing ? "Unfollow" : "Follow", for: .normal)
+        actionButton.setTitleColor(isFollowing ? .label : .white, for: .normal)
+        
+        if isFollowing {
+            actionButton.layer.borderWidth = 0.5
+            actionButton.layer.borderColor = UIColor.tertiaryLabel.cgColor
+        }
+        else {
+            actionButton.layer.borderWidth = 0
         }
     }
     
@@ -152,8 +158,8 @@ class ProfileHeaderCountView: UIView {
         case .edit:
             delegate?.profileHeaderCountViewDidTapEditProfile(self)
             
-        case .follow(let isFollowing):
-            if isFollowing {
+        case .follow:
+            if self.isFollowing {
                 // Unfollow
                 delegate?.profileHeaderCountViewDidTapUnfollow(self)
             }
@@ -161,6 +167,8 @@ class ProfileHeaderCountView: UIView {
                 // Follow
                 delegate?.profileHeaderCountViewDidTapFollow(self)
             }
+            self.isFollowing = !isFollowing
+            updateFollowButton()
         }
     }
 }
