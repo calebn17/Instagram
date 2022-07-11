@@ -56,12 +56,17 @@ class ProfileHeaderCollectionReusableView: UICollectionReusableView {
             width: width - imageView.right - 10,
             height: imageSize
         )
-        bioLabel.sizeToFit()
+        let bioSize = bioLabel.sizeThatFits(
+            CGSize(
+                width: width - 10,
+                height: height - imageSize - 10
+            )
+        )
         bioLabel.frame = CGRect(
             x: 5,
             y: imageView.bottom + 10,
-            width: width - 10,
-            height: bioLabel.height
+            width: bioSize.width - 10,
+            height: bioSize.height + 50
         )
     }
     

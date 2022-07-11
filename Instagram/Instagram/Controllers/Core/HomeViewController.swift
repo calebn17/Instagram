@@ -123,7 +123,6 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let colors: [UIColor] = [.red, .green, .blue, .systemPink, .purple, .cyan]
         
         let cellType = viewModels[indexPath.section][indexPath.row]
         

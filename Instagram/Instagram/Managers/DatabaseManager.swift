@@ -85,7 +85,6 @@ final class DatabaseManager {
             else {
                 return
             }
-            
             completion(.success(posts))
         }
     }
@@ -199,6 +198,108 @@ final class DatabaseManager {
             targetUserFollowers.document(currentUsername).setData(["valid": true])
             
             completion(true)
+        }
+    }
+    
+    public func getUserCounts(username: String, completion: @escaping ((follower: Int, following: Int, posts: Int)) -> Void) {
+        let userRef = database.collection("users").document(username)
+        
+        var followers = 0
+        var following = 0
+        var posts = 0
+        
+        let group = DispatchGroup()
+        group.enter()
+        group.enter()
+        group.enter()
+        
+        userRef.collection("posts").getDocuments { snapshot, error in
+            defer {
+                group.leave()
+            }
+            guard let count = snapshot?.documents.count,
+                  error == nil
+            else {return}
+            
+            posts = count
+        }
+        
+        userRef.collection("followers").getDocuments { snapshot, error in
+            defer {
+                group.leave()
+            }
+            guard let count = snapshot?.documents.count,
+                  error == nil
+            else {return}
+            
+            followers = count
+        }
+        
+        userRef.collection("following").getDocuments { snapshot, error in
+            defer {
+                group.leave()
+            }
+            guard let count = snapshot?.documents.count,
+                  error == nil
+            else {return}
+            
+            following = count
+        }
+        
+        // calling the global queue because we dont need this on the main thread just yet.
+        // will be called again in Profile VC, will push to the main thread there
+        group.notify(queue: .global()) {
+            let result =
+            (
+                follower: followers,
+                following: following,
+                posts: posts
+            )
+            
+            completion(result)
+        }
+    }
+    
+    public func isFollowing(targetUsername: String, completion: @escaping (Bool) -> Void) {
+        
+        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else {
+            completion(false)
+            return
+        }
+        let ref = database.collection("users").document(targetUsername).collection("followers").document(currentUsername)
+        ref.getDocument { snapshot, error in
+            guard snapshot != nil, error == nil else {
+                // The currentUsername is not in the targetUser's followers list
+                // currentUser is not following
+                completion(false)
+                return
+            }
+            // The currentUsername IS in the the targetUser's followers list
+            // currentUser is following
+            completion(true)
+        }
+    }
+    
+    public func getUserInfo(username: String, completion: @escaping (UserInfo?) -> Void) {
+        let ref = database.collection("users").document(username).collection("information").document("basic")
+        ref.getDocument { snapshot, error in
+            guard let data = snapshot?.data(),
+                  let userInfo = UserInfo(with: data)
+            else {
+                completion(nil)
+                return
+            }
+            completion(userInfo)
+        }
+    }
+    
+    public func setUserInfo(userInfo: UserInfo, completion: @escaping (Bool) -> Void) {
+        guard let username = UserDefaults.standard.string(forKey: "username"),
+              let data = userInfo.asDictionary() else {return}
+        
+        let ref = database.collection("users").document(username).collection("information").document("basic")
+        ref.setData(data) { error in
+            completion(error == nil)
         }
     }
 }
