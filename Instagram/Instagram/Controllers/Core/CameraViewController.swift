@@ -32,6 +32,13 @@ final class CameraViewController: UIViewController {
         return button
     }()
     
+    private let photoPickerButton: UIButton = {
+        let button = UIButton()
+        button.tintColor = .label
+        button.setImage(UIImage(systemName: "photo", withConfiguration: UIImage.SymbolConfiguration(pointSize: 40)), for: .normal)
+        return button
+    }()
+    
 //MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -41,9 +48,11 @@ final class CameraViewController: UIViewController {
         
         view.addSubview(cameraView)
         view.addSubview(shutterButton)
+        view.addSubview(photoPickerButton)
         setupNavBar()
         checkCameraPermissions()
         shutterButton.addTarget(self, action: #selector(didTapShutterButton), for: .touchUpInside)
+        photoPickerButton.addTarget(self, action: #selector(didTapPickPhoto), for: .touchUpInside)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -72,6 +81,13 @@ final class CameraViewController: UIViewController {
             height: buttonSize
         )
         shutterButton.layer.cornerRadius = buttonSize/2
+        
+        photoPickerButton.frame = CGRect(
+            x: (shutterButton.left - (buttonSize/1.5))/2,
+            y: shutterButton.top + (buttonSize/1.5)/2,
+            width: buttonSize/1.5,
+            height: buttonSize/1.5
+        )
     }
 
 //MARK: - Configure
@@ -150,6 +166,14 @@ final class CameraViewController: UIViewController {
             delegate: self
         )
     }
+    
+    @objc private func didTapPickPhoto() {
+        let picker = UIImagePickerController()
+        picker.sourceType = .photoLibrary
+        picker.allowsEditing = true
+        picker.delegate = self
+        present(picker, animated: true)
+    }
 }
 
 //MARK: - AVCapturePhotoCapture
@@ -161,7 +185,10 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         else {return}
         
         captureSession?.stopRunning()
-        
+        showEditPhoto(image: image)
+    }
+    
+    private func showEditPhoto(image: UIImage) {
         guard let resizedImage = image.sd_resizedImage(
             with: CGSize(
                 width: 640,
@@ -173,5 +200,18 @@ extension CameraViewController: AVCapturePhotoCaptureDelegate {
         let vc = PostEditViewController(image: resizedImage)
         vc.navigationItem.backButtonDisplayMode = .minimal
         navigationController?.pushViewController(vc, animated: false)
+    }
+}
+
+//MARK: - ImagePicker Methods
+extension CameraViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        picker.dismiss(animated: true, completion: nil)
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        picker.dismiss(animated: true, completion: nil)
+        guard let image = info[UIImagePickerController.InfoKey.editedImage] as? UIImage else {return}
+        showEditPhoto(image: image)
     }
 }

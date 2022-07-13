@@ -123,11 +123,12 @@ final class DatabaseManager {
         ref.getDocuments { snapshot, error in
             guard let posts = snapshot?.documents.compactMap({
                 Post(with: $0.data())
-            }),
-                  error == nil
+            }).sorted(by: {return $0.date > $1.date}),
+                    error == nil
             else {
                 return
             }
+            
             completion(.success(posts))
         }
     }

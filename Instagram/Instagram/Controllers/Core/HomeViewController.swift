@@ -36,32 +36,76 @@ final class HomeViewController: UIViewController {
     private func fetchPosts() {
         
         guard let username = UserDefaults.standard.string(forKey: "username") else {return}
-        DatabaseManager.shared.posts(for: username) {[weak self] result in
-            DispatchQueue.main.async {
-                switch result {
-                case .success(let posts):
-                    let group = DispatchGroup()
-                    
-                    posts.forEach { model in
-                        group.enter()
-                        self?.createViewModel(model: model, username: username) { success in
-                            defer {
-                                group.leave()
+        
+        let userGroup = DispatchGroup()
+        userGroup.enter()
+        DatabaseManager.shared.following(for: username) { followerUsernames in
+            defer {
+                userGroup.leave()
+            }
+            let users = followerUsernames + [username]
+            for current in users {
+                userGroup.enter()
+                DatabaseManager.shared.posts(for: current) {[weak self] result in
+                    DispatchQueue.main.async {
+                        switch result {
+                        case .success(let posts):
+                            let group = DispatchGroup()
+                            
+                            posts.forEach { model in
+                                group.enter()
+                                self?.createViewModel(model: model, username: current) { success in
+                                    defer {
+                                        group.leave()
+                                    }
+                                    if !success {
+                                        print("failed to create viewmodel")
+                                    }
+                                }
                             }
-                            if !success {
-                                print("failed to create viewmodel")
+                            group.notify(queue: .global()) {
+                                userGroup.leave()
                             }
+                            
+                        case .failure(let error):
+                            userGroup.leave()
+                            print(error)
                         }
                     }
-                    group.notify(queue: .main) {
-                        self?.collectionView?.reloadData()
-                    }
-                    
-                case .failure(let error):
-                    print(error)
                 }
             }
         }
+        userGroup.notify(queue: .main) {
+            self.sortViewModels()
+            self.collectionView?.reloadData()
+        }
+    }
+    
+    private func sortViewModels() {
+        self.viewModels = self.viewModels.sorted(by: { first, second in
+            var date1: Date?
+            var date2: Date?
+            
+            first.forEach { type in
+                switch type {
+                case .timestamp(viewModel: let vm):
+                    date1 = vm.date
+                default: break
+                }
+            }
+            second.forEach {type in
+                    switch type {
+                    case .timestamp(viewModel: let vm):
+                        date2 = vm.date
+                    default: break
+                    }
+            }
+            if let date1 = date1,
+               let date2 = date2 {
+                return date1 > date2
+            }
+            return false
+        })
     }
     
     private func createViewModel(model: Post, username: String, completion: @escaping (Bool) -> Void) {
