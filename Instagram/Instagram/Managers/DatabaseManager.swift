@@ -202,7 +202,7 @@ final class DatabaseManager {
     
     
     
-//MARK: - Profile Header
+//MARK: - Relationships
     
     public func isFollowing(targetUsername: String, completion: @escaping (Bool) -> Void) {
         
@@ -212,7 +212,7 @@ final class DatabaseManager {
         }
         let ref = database.collection("users").document(targetUsername).collection("followers").document(currentUsername)
         ref.getDocument { snapshot, error in
-            guard snapshot != nil, error == nil else {
+            guard snapshot?.data() != nil, error == nil else {
                 // The currentUsername is not in the targetUser's followers list
                 // currentUser is not following
                 completion(false)
@@ -221,6 +221,34 @@ final class DatabaseManager {
             // The currentUsername IS in the the targetUser's followers list
             // currentUser is following
             completion(true)
+        }
+    }
+    
+    public func followers(for username: String, completion: @escaping ([String]) -> Void) {
+        let ref = database.collection("users").document(username).collection("followers")
+        ref.getDocuments { snapshot, error in
+            guard let documents = snapshot?.documents, error == nil else {
+                completion([])
+                return
+            }
+            let usernames = documents.compactMap({ $0.documentID})
+            completion(usernames)
+        }
+    }
+    
+    /// Gets the users that the username follows
+    /// - Parameters:
+    ///   - username: the username
+    ///   - completion: async callback that returns an array of the followers' usernames
+    public func following(for username: String, completion: @escaping([String]) -> Void) {
+        let ref = database.collection("users").document(username).collection("following")
+        ref.getDocuments { snapshot, error in
+            guard let documents = snapshot?.documents, error == nil else {
+                completion([])
+                return
+            }
+            let usernames = documents.compactMap({ $0.documentID})
+            completion(usernames)
         }
     }
     
@@ -254,6 +282,7 @@ final class DatabaseManager {
         }
     }
     
+//MARK: - ProfileHeader Counts
     public func getUserCounts(username: String, completion: @escaping ((follower: Int, following: Int, posts: Int)) -> Void) {
         let userRef = database.collection("users").document(username)
         

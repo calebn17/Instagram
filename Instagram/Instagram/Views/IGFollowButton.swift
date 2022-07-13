@@ -11,7 +11,7 @@ final class IGFollowButton: UIButton {
     
     enum State: String {
         case follow = "Follow"
-        case unfollow = "UnFollow"
+        case unfollow = "Unfollow"
         
         var titleColor: UIColor {
             switch self {
