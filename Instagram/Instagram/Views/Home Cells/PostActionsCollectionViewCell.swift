@@ -9,9 +9,9 @@ import UIKit
 
 //MARK: - Protocol
 protocol PostActionsCollectionViewCellDelegate: AnyObject {
-    func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool)
-    func postActionsCollectionViewCellDidTapComment(_ cell: PostActionsCollectionViewCell)
-    func postActionsCollectionViewCellDidTapShare(_ cell: PostActionsCollectionViewCell)
+    func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool, index: Int)
+    func postActionsCollectionViewCellDidTapComment(_ cell: PostActionsCollectionViewCell, index: Int)
+    func postActionsCollectionViewCellDidTapShare(_ cell: PostActionsCollectionViewCell, index: Int)
 }
 
 final class PostActionsCollectionViewCell: UICollectionViewCell {
@@ -21,6 +21,7 @@ final class PostActionsCollectionViewCell: UICollectionViewCell {
     weak var delegate: PostActionsCollectionViewCellDelegate?
     
     private var isLiked = false
+    private var index = 0
     
 //MARK: - SubViews
     
@@ -78,14 +79,15 @@ final class PostActionsCollectionViewCell: UICollectionViewCell {
         shareButton.frame = CGRect(x: commentButton.right + 20, y: (contentView.height - size)/2, width: size, height: size)
     }
     
-//MARK: - Configure
-    
     override func prepareForReuse() {
         super.prepareForReuse()
     }
     
-    func configure(with viewModel: PostActionsCollectionViewCellViewModel) {
+//MARK: - Configure
+    
+    func configure(with viewModel: PostActionsCollectionViewCellViewModel, index: Int) {
         self.isLiked = viewModel.isLiked
+        self.index = index
         if viewModel.isLiked {
             let image = UIImage(
                 systemName: "suit.heart.fill",
@@ -116,13 +118,13 @@ final class PostActionsCollectionViewCell: UICollectionViewCell {
             likeButton.setImage(image, for: .normal)
             likeButton.tintColor = .systemRed
         }
-        delegate?.postActionsCollectionViewCellDidTapLike(self, isLiked: !isLiked)
+        delegate?.postActionsCollectionViewCellDidTapLike(self, isLiked: !isLiked, index: index)
         self.isLiked = !isLiked
     }
     @objc private func didTapComment() {
-        delegate?.postActionsCollectionViewCellDidTapComment(self)
+        delegate?.postActionsCollectionViewCellDidTapComment(self, index: index)
     }
     @objc private func didTapShare() {
-        delegate?.postActionsCollectionViewCellDidTapShare(self)
+        delegate?.postActionsCollectionViewCellDidTapShare(self, index: index)
     }
 }

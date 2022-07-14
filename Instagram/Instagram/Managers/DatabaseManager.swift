@@ -133,7 +133,7 @@ final class DatabaseManager {
         }
     }
     
-    public func explorePosts(completion: @escaping ([Post]) -> Void) {
+    public func explorePosts(completion: @escaping ([(post: Post, user: User)]) -> Void) {
         let ref = database.collection("users")
         ref.getDocuments { snapshot, error in
             guard let users = snapshot?.documents.compactMap({ User(with: $0.data()) }),
@@ -143,7 +143,7 @@ final class DatabaseManager {
                 return
             }
             let group = DispatchGroup()
-            var aggregatePosts = [Post]()
+            var aggregatePosts = [(post: Post, user: User)]()
             
             users.forEach { user in
                 group.enter()
@@ -155,7 +155,9 @@ final class DatabaseManager {
                     }
                     guard let posts = snapshot?.documents.compactMap({ Post(with: $0.data()) }),
                           error == nil else {return}
-                    aggregatePosts.append(contentsOf: posts)
+                    aggregatePosts.append(contentsOf: posts.compactMap({
+                        (post: $0, user: user)
+                    }))
                 }
             }
             group.notify(queue: .main) {

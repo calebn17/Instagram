@@ -31,6 +31,8 @@
 		AF05B363286A3B2B00DFF0B1 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B362286A3B2B00DFF0B1 /* StorageManager.swift */; };
 		AF05B365286A3B3A00DFF0B1 /* AnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B364286A3B3A00DFF0B1 /* AnalyticsManager.swift */; };
 		AF05B367286A3B4500DFF0B1 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF05B366286A3B4500DFF0B1 /* HapticsManager.swift */; };
+		AF1440DE287EFF1800F97CA2 /* SettingsModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1440DD287EFF1800F97CA2 /* SettingsModels.swift */; };
+		AF1440E0287F995000F97CA2 /* CommentCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF1440DF287F995000F97CA2 /* CommentCollectionViewCell.swift */; };
 		AF267126286A2EA2000E4702 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF267125286A2EA2000E4702 /* AppDelegate.swift */; };
 		AF267128286A2EA2000E4702 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF267127286A2EA2000E4702 /* SceneDelegate.swift */; };
 		AF26712A286A2EA2000E4702 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF267129286A2EA2000E4702 /* HomeViewController.swift */; };
@@ -122,6 +124,8 @@
 		AF05B362286A3B2B00DFF0B1 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		AF05B364286A3B3A00DFF0B1 /* AnalyticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsManager.swift; sourceTree = "<group>"; };
 		AF05B366286A3B4500DFF0B1 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
+		AF1440DD287EFF1800F97CA2 /* SettingsModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModels.swift; sourceTree = "<group>"; };
+		AF1440DF287F995000F97CA2 /* CommentCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentCollectionViewCell.swift; sourceTree = "<group>"; };
 		AF267122286A2EA2000E4702 /* Instagram.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Instagram.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF267125286A2EA2000E4702 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		AF267127286A2EA2000E4702 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -232,6 +236,7 @@
 				AF780989287A12690095EF36 /* ProfileHeaderCountView.swift */,
 				AFDBE461287C7AE600551C90 /* IGFollowButton.swift */,
 				AF02BCA7287D9F3600AF296F /* ListUserTableViewCell.swift */,
+				AF1440DF287F995000F97CA2 /* CommentCollectionViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -246,6 +251,7 @@
 				AF52836C286C7A4800CC1DD3 /* HomeFeedCellType.swift */,
 				AFB7D74E287745EC00FC0ECD /* NotificationCellType.swift */,
 				AFCFE97F287C4E7900BB4201 /* UserInfo.swift */,
+				AF1440DD287EFF1800F97CA2 /* SettingsModels.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -671,6 +677,7 @@
 				AFF360C5286C834700F3145A /* PostDatetimeCollectionViewCell.swift in Sources */,
 				AF26712A286A2EA2000E4702 /* HomeViewController.swift in Sources */,
 				AFB7D7472877411C00FC0ECD /* FollowNotificationTableViewCell.swift in Sources */,
+				AF1440DE287EFF1800F97CA2 /* SettingsModels.swift in Sources */,
 				AF528360286C783200CC1DD3 /* PosterCollectionViewCellViewModel.swift in Sources */,
 				AF02BCAA287DA15B00AF296F /* ListUserTableViewCellViewModel.swift in Sources */,
 				AF78098C287A18620095EF36 /* ProfileHeaderCountViewModel.swift in Sources */,
@@ -710,6 +717,7 @@
 				AF52836D286C7A4800CC1DD3 /* HomeFeedCellType.swift in Sources */,
 				AFF360C3286C833D00F3145A /* PostCaptionCollectionViewCell.swift in Sources */,
 				AFB7D74D2877445100FC0ECD /* NotificationsManager.swift in Sources */,
+				AF1440E0287F995000F97CA2 /* CommentCollectionViewCell.swift in Sources */,
 				AF631DC2286A48D6009FB124 /* Extensions.swift in Sources */,
 				AF05B351286A369200DFF0B1 /* ListViewController.swift in Sources */,
 				AF05B342286A35D200DFF0B1 /* CameraViewController.swift in Sources */,

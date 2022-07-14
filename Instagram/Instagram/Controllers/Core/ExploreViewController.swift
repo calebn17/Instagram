@@ -13,7 +13,7 @@ final class ExploreViewController: UIViewController {
 //MARK: - Properties
     
     private let searchVC = UISearchController(searchResultsController: SearchResultsViewController())
-    private var posts = [Post]()
+    private var posts = [(post: Post, user: User)]()
     
 //MARK: - Subviews
     private let collectionView: UICollectionView = {
@@ -148,15 +148,15 @@ extension ExploreViewController: UICollectionViewDelegate, UICollectionViewDataS
         else {return UICollectionViewCell()}
         
         let model = posts[indexPath.row]
-        cell.configure(with: URL(string: model.postURLString))
+        cell.configure(with: URL(string: model.post.postURLString))
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         
-        let post = posts[indexPath.row]
-        let vc = PostViewController(with: post)
+        let model = posts[indexPath.row]
+        let vc = PostViewController(with: model.post, username: model.user.username)
         navigationController?.pushViewController(vc, animated: true)
     }
 }

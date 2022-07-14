@@ -17,6 +17,7 @@ final class ProfileViewController: UIViewController {
     }
     private var headerViewModel: ProfileHeaderViewModel?
     private var posts: [Post] = []
+    private var observer: NSObjectProtocol?
     
 //MARK: - SubViews
     
@@ -42,6 +43,17 @@ final class ProfileViewController: UIViewController {
         configureNavBar()
         configureCollectionView()
         fetchProfileInfo()
+        
+        if isCurrentUser{
+            observer = NotificationCenter.default.addObserver(
+                forName: .didPostNotification,
+                object: nil,
+                queue: .main) { [weak self] _ in
+                    self?.posts.removeAll()
+                    self?.fetchProfileInfo()
+                    self?.collectionView?.reloadData()
+                }
+        }
         
     }
     
@@ -175,7 +187,7 @@ extension ProfileViewController: UICollectionViewDelegate, UICollectionViewDataS
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true)
         let post = posts[indexPath.row]
-        let vc = PostViewController(with: post)
+        let vc = PostViewController(with: post, username: user.username)
         navigationController?.pushViewController(vc, animated: true)
     }
     

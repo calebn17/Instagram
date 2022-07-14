@@ -296,7 +296,7 @@ extension NotificationsViewController: FollowNotificationTableViewCellDelegate, 
                     return
                 }
                 
-                let vc = PostViewController(with: post)
+                let vc = PostViewController(with: post, username: username)
                 self?.navigationController?.pushViewController(vc, animated: true)
             }
             

@@ -10,7 +10,7 @@ import SDWebImage
 
 //MARK: - Protocol
 protocol PosterCollectionViewCellDelegate: AnyObject {
-    func PosterCollectionViewCellDelegateDidTapMore(_ cell: PosterCollectionViewCell)
+    func PosterCollectionViewCellDelegateDidTapMore(_ cell: PosterCollectionViewCell, index: Int)
     func PosterCollectionViewCellDelegateDidTapUsername(_ cell: PosterCollectionViewCell)
 }
 
@@ -19,6 +19,7 @@ final class PosterCollectionViewCell: UICollectionViewCell {
     
     static let identifier = "PosterCollectionViewCell"
     weak var delegate: PosterCollectionViewCellDelegate?
+    private var index = 0
     
 //MARK: - SubViews
     
@@ -94,7 +95,8 @@ final class PosterCollectionViewCell: UICollectionViewCell {
         imageView.image = nil
     }
     
-    func configure(with viewModel: PosterCollectionViewCellViewModel) {
+    func configure(with viewModel: PosterCollectionViewCellViewModel, index: Int) {
+        self.index = index
         usernameLabel.text = viewModel.username
         imageView.sd_setImage(with: viewModel.profilePictureURL, completed: nil)
     }
@@ -102,7 +104,7 @@ final class PosterCollectionViewCell: UICollectionViewCell {
 //MARK: - Actions
     
     @objc private func didTapMore() {
-        delegate?.PosterCollectionViewCellDelegateDidTapMore(self)
+        delegate?.PosterCollectionViewCellDelegateDidTapMore(self, index: index)
     }
     
     @objc private func didTapUsername() {
