@@ -135,11 +135,15 @@ final class HomeViewController: UIViewController {
     
     private func createViewModel(model: Post, username: String, completion: @escaping (Bool) -> Void) {
         
+        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else {return}
+        
         StorageManager.shared.downloadProfilePictureURL(for: username) {[weak self] profilePictureURL in
             
             guard let postURL = URL(string: model.postURLString),
                   let profilePictureURL = profilePictureURL
             else {completion(false); return}
+            
+            let isLiked = model.likers.contains(currentUsername)
 
             let postData: [HomeFeedCellType] =
             [
@@ -157,12 +161,12 @@ final class HomeViewController: UIViewController {
                 .actions(
                     viewModel:
                         PostActionsCollectionViewCellViewModel(
-                            isLiked: false)
+                            isLiked: isLiked)
                 ),
                 .likeCount(
                     viewModel:
                         PostLikesCollectionViewCellViewModel(
-                            likers: [])
+                            likers: model.likers)
                 ),
                 .caption(
                     viewModel:
@@ -215,7 +219,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                         for: indexPath)
                     as? PostCollectionViewCell
             else {fatalError()}
-            cell.configure(with: viewModel)
+            cell.configure(with: viewModel, index: indexPath.section)
             cell.delegate = self
             return cell
             
@@ -241,7 +245,7 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
                         for: indexPath)
                     as? PostLikesCollectionViewCell
             else {fatalError()}
-            cell.configure(with: viewModel)
+            cell.configure(with: viewModel, index: indexPath.section)
             cell.delegate = self
             return cell
             
@@ -267,6 +271,31 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
             
             return cell
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader,
+              let headerView = collectionView.dequeueReusableSupplementaryView(
+                ofKind: kind,
+                withReuseIdentifier: StoryHeaderView.identifier,
+                for: indexPath)
+                as? StoryHeaderView
+        else {return UICollectionReusableView()}
+        
+        let viewModel = StoriesViewModel(
+            stories: [
+                Story(username: "jeffbezos",image: UIImage(named: "test")),
+                Story(username: "jeffbezos",image: UIImage(named: "test")),
+                Story(username: "jeffbezos",image: UIImage(named: "test")),
+                Story(username: "jeffbezos",image: UIImage(named: "test")),
+                Story(username: "jeffbezos",image: UIImage(named: "test")),
+                Story(username: "jeffbezos",image: UIImage(named: "test")),
+                Story(username: "jeffbezos",image: UIImage(named: "test")),
+                Story(username: "jeffbezos",image: UIImage(named: "test"))
+            ]
+        )
+        headerView.configure(with: viewModel)
+        return headerView
     }
 }
 
@@ -306,15 +335,39 @@ extension HomeViewController: PosterCollectionViewCellDelegate {
 
 //MARK: - Post Cell Methods
 extension HomeViewController: PostCollectionViewCellDelegate {
-    func postCollectionViewCellDidLike(_ cell: PostCollectionViewCell) {
-        print("did tap like")
+    /// Double Tap
+    func postCollectionViewCellDidLike(_ cell: PostCollectionViewCell, index: Int) {
+        let tuple = allPosts[index]
+        
+        DatabaseManager.shared.updateLike(
+            state: .like,
+            postID: tuple.post.id,
+            owner: tuple.owner) { success in
+                
+            if !success {
+                print("Something went wrong... could not update like status")
+            }
+        }
     }
 }
 
 //MARK: - Post Actions Cell Methods
 extension HomeViewController: PostActionsCollectionViewCellDelegate {
     func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool, index: Int) {
-        //call DB to update like state
+        
+        let state: DatabaseManager.LikeState = isLiked ? .like : .unlike
+        
+        let tuple = allPosts[index]
+        
+        DatabaseManager.shared.updateLike(
+            state: state,
+            postID: tuple.post.id,
+            owner: tuple.owner) { success in
+                
+            if !success {
+                print("Something went wrong... could not update like status")
+            }
+        }
     }
     
     func postActionsCollectionViewCellDidTapComment(_ cell: PostActionsCollectionViewCell, index: Int) {
@@ -344,8 +397,8 @@ extension HomeViewController: PostActionsCollectionViewCellDelegate {
 
 //MARK: - Post Likes Cell Methods
 extension HomeViewController: PostLikesCollectionViewCellDelegate {
-    func PostLikesCollectionViewCellDidTapLikeCount(_ cell: PostLikesCollectionViewCell) {
-        let vc = ListViewController(type: .likers(usernames: []))
+    func PostLikesCollectionViewCellDidTapLikeCount(_ cell: PostLikesCollectionViewCell, index: Int) {
+        let vc = ListViewController(type: .likers(usernames: allPosts[index].post.likers))
         navigationController?.pushViewController(vc, animated: true)
     }
 }
@@ -421,7 +474,21 @@ extension HomeViewController {
                 
                 //Section
                 let section = NSCollectionLayoutSection(group: group)
-                //adding some padding between sections
+                
+                if index == 0 {
+                    section.boundarySupplementaryItems = [
+                        NSCollectionLayoutBoundarySupplementaryItem(
+                            layoutSize: NSCollectionLayoutSize(
+                                widthDimension: .fractionalWidth(1),
+                                heightDimension: .fractionalWidth(0.3)
+                            ),
+                            elementKind: UICollectionView.elementKindSectionHeader,
+                            alignment: .top
+                        )
+                    ]
+                }
+                
+                // adding some padding between sections
                 section.contentInsets = NSDirectionalEdgeInsets(top: 3, leading: 0, bottom: 10, trailing: 0)
                 return section
             })
@@ -436,6 +503,7 @@ extension HomeViewController {
         collectionView.register(PostLikesCollectionViewCell.self, forCellWithReuseIdentifier: PostLikesCollectionViewCell.identifier)
         collectionView.register(PostCaptionCollectionViewCell.self, forCellWithReuseIdentifier: PostCaptionCollectionViewCell.identifier)
         collectionView.register(PostDatetimeCollectionViewCell.self, forCellWithReuseIdentifier: PostDatetimeCollectionViewCell.identifier)
+        collectionView.register(StoryHeaderView.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: StoryHeaderView.identifier)
         self.collectionView = collectionView
     }
 }

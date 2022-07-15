@@ -9,7 +9,7 @@ import UIKit
 
 //MARK: - Protocol
 protocol PostLikesCollectionViewCellDelegate: AnyObject {
-    func PostLikesCollectionViewCellDidTapLikeCount(_ cell: PostLikesCollectionViewCell)
+    func PostLikesCollectionViewCellDidTapLikeCount(_ cell: PostLikesCollectionViewCell, index: Int)
 }
 
 final class PostLikesCollectionViewCell: UICollectionViewCell {
@@ -17,6 +17,7 @@ final class PostLikesCollectionViewCell: UICollectionViewCell {
 //MARK: - Properties
     static let identifier = "PostLikesCollectionViewCell"
     weak var delegate: PostLikesCollectionViewCellDelegate?
+    private var index = 0
     
 //MARK: - SubViews
     
@@ -53,7 +54,8 @@ final class PostLikesCollectionViewCell: UICollectionViewCell {
         super.prepareForReuse()
     }
     
-    func configure(with viewModel: PostLikesCollectionViewCellViewModel) {
+    func configure(with viewModel: PostLikesCollectionViewCellViewModel, index: Int) {
+        self.index = index
         let users = viewModel.likers
         label.text = "\(users.count) Likes"
     }
@@ -61,6 +63,6 @@ final class PostLikesCollectionViewCell: UICollectionViewCell {
 //MARK: - Actions
     
     @objc private func didTapLabel() {
-        delegate?.PostLikesCollectionViewCellDidTapLikeCount(self)
+        delegate?.PostLikesCollectionViewCellDidTapLikeCount(self, index: index)
     }
 }

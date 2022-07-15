@@ -49,7 +49,7 @@ class PhotoCollectionViewCell: UICollectionViewCell {
         imageView.image = nil
     }
     
-    func configure(with image: UIImage) {
+    func configure(with image: UIImage?) {
         imageView.image = image
     }
     

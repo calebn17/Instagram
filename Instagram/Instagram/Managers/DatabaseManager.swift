@@ -344,4 +344,93 @@ final class DatabaseManager {
             completion(result)
         }
     }
+    
+//MARK: - Comments
+    public func getComments(
+        postID: String,
+        owner: String,
+        completion: @escaping ([Comment]) -> Void) {
+            
+        let ref = database.collection("user").document(owner).collection("posts").document(postID).collection("comments")
+        ref.getDocuments { snapshot, error in
+            guard let comments = snapshot?.documents
+                    .compactMap({
+                        Comment(with: $0.data())
+                    }),
+                  error == nil else {
+                      completion([])
+                      return
+                  }
+            completion(comments)
+        }
+    }
+    
+    public func insertComments(
+        comment: Comment,
+        postID: String,
+        owner: String,
+        completion: @escaping (Bool) -> Void) {
+            
+        let newID = "\(postID)_\(comment.username)_\(Date().timeIntervalSince1970)_\(Int.random(in: 0...1000))"
+        let ref = database
+                .collection("users")
+                .document(owner)
+                .collection("posts")
+                .document(postID)
+                .collection("comments")
+                .document(newID)
+        guard let data = comment.asDictionary() else {return}
+        ref.setData(data) { error in
+            completion(error == nil)
+            print(postID)
+            print(data)
+        }
+    }
+
+//MARK: - Like
+    
+    enum LikeState {
+        case like
+        case unlike
+    }
+    
+    public func updateLike(
+        state: LikeState,
+        postID: String,
+        owner: String,
+        completion: @escaping (Bool) -> Void) {
+            
+        guard let currentUsername = UserDefaults.standard.string(forKey: "username") else {return}
+        
+        let ref = database
+            .collection("users")
+            .document(owner)
+            .collection("posts")
+            .document(postID)
+        
+        getPost(with: postID, from: owner) { post in
+            guard var post = post else {
+                completion(false)
+                return
+            }
+            
+            switch state {
+            case .like:
+                if !post.likers.contains(currentUsername) {
+                    post.likers.append(currentUsername)
+                }
+                
+            case .unlike:
+                post.likers.removeAll(where: {$0 == currentUsername})
+            }
+            
+            guard let data = post.asDictionary() else {
+                completion(false)
+                return
+            }
+            ref.setData(data) { error in
+                completion(error == nil)
+            }
+        }
+    }
 }
