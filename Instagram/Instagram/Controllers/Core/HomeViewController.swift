@@ -322,7 +322,8 @@ extension HomeViewController: PosterCollectionViewCellDelegate {
             }
         }))
         sheet.addAction(UIAlertAction(title: "Report Post", style: .destructive, handler: { _ in
-            
+            // Report
+            AnalyticsManager.shared.logFeedInteraction(.reported)
         }))
         present(sheet, animated: true)
     }
@@ -337,6 +338,8 @@ extension HomeViewController: PosterCollectionViewCellDelegate {
 extension HomeViewController: PostCollectionViewCellDelegate {
     /// Double Tap
     func postCollectionViewCellDidLike(_ cell: PostCollectionViewCell, index: Int) {
+        
+        AnalyticsManager.shared.logFeedInteraction(.doubleTapToLike)
         let tuple = allPosts[index]
         
         DatabaseManager.shared.updateLike(
@@ -355,6 +358,7 @@ extension HomeViewController: PostCollectionViewCellDelegate {
 extension HomeViewController: PostActionsCollectionViewCellDelegate {
     func postActionsCollectionViewCellDidTapLike(_ cell: PostActionsCollectionViewCell, isLiked: Bool, index: Int) {
         
+        HapticsManager.shared.vibrateForSelection()
         let state: DatabaseManager.LikeState = isLiked ? .like : .unlike
         
         let tuple = allPosts[index]
@@ -371,7 +375,11 @@ extension HomeViewController: PostActionsCollectionViewCellDelegate {
     }
     
     func postActionsCollectionViewCellDidTapComment(_ cell: PostActionsCollectionViewCell, index: Int) {
+        
+        AnalyticsManager.shared.logFeedInteraction(.comment)
         let tuple = allPosts[index]
+        
+        HapticsManager.shared.vibrateForSelection()
         
         let vc = PostViewController(with: tuple.post, username: tuple.owner)
         vc.title = "Comment"
@@ -379,6 +387,8 @@ extension HomeViewController: PostActionsCollectionViewCellDelegate {
     }
     
     func postActionsCollectionViewCellDidTapShare(_ cell: PostActionsCollectionViewCell, index: Int) {
+        
+        AnalyticsManager.shared.logFeedInteraction(.share)
         
         let section = viewModels[index]
         section.forEach { cellType in
@@ -398,6 +408,9 @@ extension HomeViewController: PostActionsCollectionViewCellDelegate {
 //MARK: - Post Likes Cell Methods
 extension HomeViewController: PostLikesCollectionViewCellDelegate {
     func PostLikesCollectionViewCellDidTapLikeCount(_ cell: PostLikesCollectionViewCell, index: Int) {
+        
+        HapticsManager.shared.vibrateForSelection()
+        
         let vc = ListViewController(type: .likers(usernames: allPosts[index].post.likers))
         navigationController?.pushViewController(vc, animated: true)
     }

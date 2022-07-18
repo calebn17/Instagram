@@ -194,12 +194,14 @@ final class SignUpViewController: UIViewController {
         AuthManager.shared.signUp(email: email, username: username, password: password, profilePicture: data) { [weak self] result in
             switch result {
             case .success(let user):
+                HapticsManager.shared.vibrate(for: .success)
                 UserDefaults.standard.set(user.email, forKey: "email")
                 UserDefaults.standard.set(user.username, forKey: "username")
                 //the root controller in this case is the Signedin screen (defined in SceneDelegate)
                 self?.navigationController?.popToRootViewController(animated: true)
                 self?.completion?()
             case .failure(let error):
+                HapticsManager.shared.vibrate(for: .error)
                 print("Sign Up Error: \(error.localizedDescription)")
             }
         }

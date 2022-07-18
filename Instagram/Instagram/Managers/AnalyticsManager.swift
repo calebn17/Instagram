@@ -13,10 +13,23 @@ final class AnalyticsManager {
     static let shared = AnalyticsManager()
     private init() {}
     
+    enum FeedInteraction: String {
+        case like
+        case comment
+        case share
+        case reported
+        case doubleTapToLike
+    }
     
-    func logEvent() {
-        Analytics.logEvent("", parameters: [:])
+    func logFeedInteraction(_ type: FeedInteraction) {
+        Analytics.logEvent(
+            "feedback_interaction",
+            parameters: [
+                "type": type.rawValue.lowercased()
+            ]
+        )
     }
 }
 
     
+

@@ -37,3 +37,5 @@ final class NotificationsManager {
         DatabaseManager.shared.insertNotification(identifier: id, data: dictionary, for: username)
     }
 }
+
+

@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import Appirater
 
 class PostViewController: UIViewController {
     
@@ -44,6 +45,11 @@ class PostViewController: UIViewController {
         commentBarView.delegate = self
         fetchPost()
         observeKeyboardChange()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        Appirater.tryToShowPrompt()
     }
     
     override func viewDidLayoutSubviews() {
